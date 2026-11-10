@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistem Informasi Sekolah</title>
+  <!-- WAJIB ADA: Baris ini memanggil desain Tailwind CSS dari stylesheet.html -->
+  <?!= include('stylesheet'); ?>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+  <!-- Sidebar Navigasi -->
+  <aside id="sidebar" class="w-64 bg-slate-800 text-white flex flex-col transition-all duration-300 h-screen no-print">
+    <div class="p-5 font-bold text-xl border-b border-slate-700 text-center flex flex-col items-center">
+  <!-- Ganti LINK_LOGO_ANDA dengan URL gambar logo yang sudah Anda unggah -->
+  <img src="https://drive.google.com/thumbnail?id=18hU1rW7RUfZ2P2qxojcQ35GNUjt-hkRA" alt="logo sd" class="w-16 h-16 mb-2 rounded-full bg-white p-1 shadow-md object-cover">
+  <span>SIM Sekolah</span>
+</div>
+    <nav class="flex-1 overflow-y-auto py-4">
+      <ul class="space-y-1">
+        	<li><a href="#" onclick="showPage('dashboard')" class="block py-2 px-4 hover:bg-slate-700"><i class="fas fa-home w-6"></i> Dashboard</a></li>
+	<li><a href="#" onclick="showPage('data-siswa')" class="block py-2 px-4 hover:bg-slate-700"><i class="fas fa-user-graduate w-6"></i> Data Siswa</a></li>
+        <li><a href="#" onclick="showPage('data-guru')" class="block py-2 px-4 hover:bg-slate-700"><i class="fas fa-chalkboard-teacher w-6"></i> Data Guru</a></li>
+	<li><a href="#" onclick="showPage('mutasi'); muatDataMutasi();" class="block py-2 px-4 hover:bg-slate-700 text-yellow-300"><i class="fas fa-exchange-alt w-6"></i> Mutasi Siswa</a></li>
+	<li><a href="#" onclick="showPage('induk'); muatDataIndukBulanan(); muatDataIndukLulusan();" class="block py-2 px-4 hover:bg-slate-700 text-yellow-300"><i class="fas fa-database w-6"></i> Data Induk</a></li>
+        <li><a href="#" onclick="showPage('surat-masuk')" class="block py-2 px-4 hover:bg-slate-700"><i class="fas fa-inbox w-6"></i> Arsip Surat Masuk</a></li>
+        <li><a href="#" onclick="showPage('surat-keluar')" class="block py-2 px-4 hover:bg-slate-700"><i class="fas fa-paper-plane w-6"></i> Arsip Surat Keluar</a></li>
+        <li><a href="#" onclick="showPage('pembiayaan')" class="block py-2 px-4 hover:bg-slate-700"><i class="fas fa-money-bill w-6"></i> Pembiayaan & Gaji</a></li>
+        <li><a href="#" onclick="showPage('rincian-biaya'); muatUniversal('Data_Rincian_Biaya', 'rb');" class="block py-2 px-4 hover:bg-slate-700 text-yellow-300"><i class="fas fa-file-invoice-dollar w-6"></i> Rincian Biaya Siswa</a></li>      
+        <li><a href="#" onclick="showPage('rapor')" class="block py-2 px-4 hover:bg-slate-700"><i class="fas fa-book w-6"></i> Input Nilai Rapor</a></li>
+        <li><a href="#" onclick="showPage('lhb')" class="block py-2 px-4 hover:bg-slate-700 text-yellow-300"><i class="fas fa-file-signature w-6"></i> Nilai LHB (UTS)</a></li>
+        <li><a href="#" onclick="showPage('transkrip')" class="block py-2 px-4 hover:bg-slate-700 text-yellow-300"><i class="fas fa-file-alt w-6"></i> Transkrip & Ijazah</a></li>
+        <li><a href="#" onclick="showPage('portofolio'); muatPortofolio();" class="block py-2 px-4 hover:bg-slate-700 text-yellow-300"><i class="fas fa-book-open w-6"></i> Portofolio Nilai Siswa</a></li>
+	      <li><a href="#" onclick="showPage('rapor'); muatDataRaporSiswa();" class="block py-2 px-4 hover:bg-slate-700 text-green-300"><i class="fas fa-graduation-cap w-6"></i> Cetak Rapor Siswa</a></li>
+        <li><a href="#" onclick="showPage('daftar1'); muatDataDaftar1();" class="block py-2 px-4 hover:bg-slate-700 text-yellow-300"><i class="fas fa-table w-6"></i> Laporan Daftar 1 Bulanan</a></li>
+	      <li><a href="#" onclick="showPage('akun'); muatAkun();" class="block py-2 px-4 hover:bg-slate-700 text-yellow-300"><i class="fas fa-id-card w-6"></i> Kelola Akun (QR & PIN)</a></li>
+	      <li><a href="#" onclick="showPage('absensi')" class="block py-2 px-4 hover:bg-slate-700"><i class="fas fa-camera w-6"></i> Absensi Face ID</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Konten Utama -->
+  <main class="flex-1 bg-gray-100 relative h-screen overflow-hidden">
+  
+  <!-- TOMBOL BUKA/TUTUP MENU (Akan hilang saat dicetak) -->
+  <div class="bg-white shadow p-3 flex items-center gap-3 no-print z-10 relative">
+    <button onclick="toggleSidebar()" class="bg-blue-800 text-white px-3 py-2 rounded hover:bg-blue-700 shadow font-bold">
+      <i class="fas fa-bars"></i> Menu Utama
+    </button>
+    <h1 class="font-bold text-gray-700 text-sm md:text-base">Sistem Administrasi SDIT ANNIHAYAH</h1>
+  </div>
+
+  <!-- Konten-konten modul Anda ada di bawah sini... -->
+    
+    <!-- 1. DASHBOARD -->
+    <div id="page-dashboard" class="page-content p-6">
+      <h2 class="text-2xl font-bold mb-6 text-gray-800">Dashboard Statistik</h2>
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="bg-white p-5 rounded shadow"><h3 class="text-lg text-gray-500">Surat Masuk</h3><p class="text-3xl font-bold text-blue-600" id="dash-sm">0</p></div>
+        <div class="bg-white p-5 rounded shadow"><h3 class="text-lg text-gray-500">Surat Keluar</h3><p class="text-3xl font-bold text-green-600" id="dash-sk">0</p></div>
+      </div>
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="bg-white p-5 rounded shadow"><canvas id="chartLulusan"></canvas></div>
+        <div class="bg-white p-5 rounded shadow"><canvas id="chartSiswa"></canvas></div>
+      </div>
+      <div class="bg-white p-5 rounded shadow">
+        <h3 class="text-lg font-bold mb-3">Tabel Jumlah Rombel</h3>
+        <table class="w-full text-left border-collapse" id="table-rombel">
+          <thead><tr class="bg-gray-200"><th class="p-2 border">Kelas</th><th class="p-2 border">Jml Rombel</th><th class="p-2 border">Jml Siswa</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2. ARSIP SURAT MASUK -->
+    <div id="page-surat-masuk" class="page-content hidden p-6">
+      <h2 class="text-2xl font-bold mb-4">Arsip Surat Masuk</h2>
+      <div class="bg-white p-4 rounded shadow mb-4">
+        <input type="hidden" id="smBaris">
+        <div class="grid grid-cols-3 gap-4 mb-4">
+          <div><label class="text-sm font-semibold">Pengirim</label><input type="text" id="smPengirim" class="w-full border p-2 rounded"></div>
+          <div><label class="text-sm font-semibold">Tgl Terima</label><input type="date" id="smTanggal" class="w-full border p-2 rounded"></div>
+          <div><label class="text-sm font-semibold">Link Bukti Scan</label><input type="text" id="smScan" class="w-full border p-2 rounded"></div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="simpanSuratMasuk()" class="bg-green-600 text-white px-4 py-2 rounded"><i class="fas fa-save"></i> Simpan ke Drive</button>
+          <button onclick="resetSuratMasuk()" class="bg-gray-500 text-white px-4 py-2 rounded"><i class="fas fa-undo"></i> Batal</button>
+        </div>
+      </div>
+      <button onclick="muatSuratMasuk()" class="mb-2 bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+      <table class="w-full bg-white rounded shadow text-left border-collapse text-sm" id="tabel-sm">
+        <thead><tr class="bg-gray-200"><th class="p-2 border">Pengirim</th><th class="p-2 border">Tgl Terima</th><th class="p-2 border">Bukti</th><th class="p-2 border">Aksi</th></tr></thead>
+        <tbody><tr><td class="p-2 border" colspan="4" class="text-center">Klik Refresh Data...</td></tr></tbody>
+      </table>
+    </div>
+
+   <!-- ========================================== -->
+    <!-- 3. SURAT KELUAR (3 FORMAT DINAMIS)         -->
+    <!-- ========================================== -->
+    <div id="page-surat-keluar" class="page-content hidden h-full">
+      <div class="flex h-full">
+        <!-- Form Kiri -->
+        <div class="w-1/3 bg-white p-6 overflow-y-auto border-r shadow-lg no-print text-sm">
+          <h2 class="text-xl font-bold mb-4">Tulis Surat Keluar</h2>
+          <div class="space-y-3">
+            <div>
+              <label class="font-semibold text-blue-700">Pilih Jenis Surat</label>
+              <select id="skJenis" class="w-full border-2 border-blue-400 p-2 rounded font-bold" onchange="gantiJenisSurat()">
+                <option value="aktif">Surat Keterangan Aktif</option>
+                <option value="terima">Surat Keterangan Terima Siswa</option>
+                <option value="pindah">Surat Keterangan Pindah Sekolah</option>
+              </select>
+            </div>
+            
+            <h3 class="font-bold border-b pb-1 mt-4">Data Surat & Siswa Dasar</h3>
+            <div><label class="font-semibold">Nomor Surat</label><input type="text" id="skNomor" value="400.3.11 /     / SDIT-ANN /   / 2026" class="w-full border p-1 rounded" oninput="updateSuratKeluar()"></div>
+            <div><label class="font-semibold">Nama Siswa</label><input type="text" id="skNama" class="w-full border p-1 rounded" oninput="updateSuratKeluar()"></div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="font-semibold">NIS</label><input type="text" id="skNis" class="w-full border p-1 rounded" oninput="updateSuratKeluar()"></div>
+              <div><label class="font-semibold">NISN</label><input type="text" id="skNisn" class="w-full border p-1 rounded" oninput="updateSuratKeluar()"></div>
+            </div>
+            
+            <!-- Kolom Dinamis yang muncul/hilang sesuai jenis surat -->
+            <div id="formGrupTtl" class="grid grid-cols-2 gap-2">
+              <div class="col-span-2"><label class="font-semibold">Tempat, Tgl Lahir</label><input type="text" id="skTtl" placeholder="Cth: Karawang, 2 Januari 2015" class="w-full border p-1 rounded" oninput="updateSuratKeluar()"></div>
+            </div>
+            
+            <div id="formGrupJkKelas" class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="font-semibold">Jenis Kelamin</label>
+                <select id="skJk" class="w-full border p-1 rounded" onchange="updateSuratKeluar()">
+                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Perempuan">Perempuan</option>
+                </select>
+              </div>
+              <div><label class="font-semibold">Kelas</label><input type="text" id="skKelas" placeholder="Cth: VI (Enam)" class="w-full border p-1 rounded" oninput="updateSuratKeluar()"></div>
+            </div>
+
+            <div id="formGrupTahun">
+              <label class="font-semibold">Tahun Pelajaran</label><input type="text" id="skTahun" value="2026/2027" class="w-full border p-1 rounded" oninput="updateSuratKeluar()">
+            </div>
+
+            <div id="formGrupAsal" class="hidden">
+              <label class="font-semibold text-green-700">Sekolah Asal (Siswa Pindahan)</label>
+              <input type="text" id="skAsal" placeholder="Cth: SDN Dewisari I" class="w-full border p-1 rounded" oninput="updateSuratKeluar()">
+            </div>
+
+            <div id="formGrupPindah" class="hidden space-y-2 border-t pt-2 mt-2">
+              <h3 class="font-bold">Data Orang Tua & Tujuan Pindah</h3>
+              <div class="grid grid-cols-2 gap-2">
+                <div><label class="font-semibold">Nama Ayah</label><input type="text" id="skAyah" class="w-full border p-1 rounded" oninput="updateSuratKeluar()"></div>
+                <div><label class="font-semibold">Nama Ibu</label><input type="text" id="skIbu" class="w-full border p-1 rounded" oninput="updateSuratKeluar()"></div>
+              </div>
+              <div><label class="font-semibold">Sekolah Tujuan (Lengkap dengan Alamat)</label><textarea id="skTujuan" class="w-full border p-1 rounded h-16" oninput="updateSuratKeluar()"></textarea></div>
+              <div><label class="font-semibold">Alasan Pindah</label><input type="text" id="skAlasan" placeholder="Cth: permintaan orangtua" class="w-full border p-1 rounded" oninput="updateSuratKeluar()"></div>
+            </div>
+            
+            <h3 class="font-bold border-b pb-1 mt-4">Tanggal Penerbitan</h3>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="font-semibold">Tempat</label><input type="text" id="skTempat" value="Rawamerta" class="w-full border p-1 rounded" oninput="updateSuratKeluar()"></div>
+              <div><label class="font-semibold">Tanggal Surat</label><input type="text" id="skTanggal" value="7 September 2026" class="w-full border p-1 rounded" oninput="updateSuratKeluar()"></div>
+            </div>
+
+            <button onclick="window.print()" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 mt-4"><i class="fas fa-print"></i> Cetak Surat Keluar</button>
+          </div>
+          <!-- CONTOH UNTUK SURAT KELUAR (Letakkan di bawah tombol Cetak) -->
+            <input type="hidden" id="skBaris">
+            <div class="flex gap-2 pt-2 border-t">
+              <button onclick="simpanUniversal('Data_Surat_Keluar', 'sk')" class="w-1/2 bg-green-600 text-white p-2 rounded hover:bg-green-700"><i class="fas fa-save"></i> Simpan Data</button>
+              <button onclick="muatUniversal('Data_Surat_Keluar', 'sk')" class="w-1/2 bg-blue-100 text-blue-800 p-2 rounded"><i class="fas fa-list"></i> Lihat Data</button>
+            </div>
+            <!-- Tabel Rekapan Mini di bawah form -->
+            <div class="mt-4 overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse" id="tabel-sk">
+                <thead class="bg-gray-200"><tr><th class="border p-1">Info 1</th><th class="border p-1">Aksi</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+        </div>
+
+        <!-- Live Preview Kanan (Kertas A4) -->
+        <div class="w-2/3 preview-area">
+          <div class="a4-paper" style="font-family: 'Times New Roman', Times, serif; font-size: 12pt; padding: 15mm 20mm; line-height: 1.4;">
+            
+            <!-- KOP SURAT (Berlaku untuk semua jenis surat) -->
+            <div style="border-bottom: 4px solid #008000; padding-bottom: 5px; margin-bottom: 20px; color: #008000; display: flex; align-items: center;">
+              
+              <!-- Kolom Logo (Sebelah Kiri) -->
+              <div style="width: 30%; text-align: center;">
+                <!-- Ganti LINK_LOGO_ANDA dengan URL gambar logo yang sama -->
+                <img src="https://drive.google.com/thumbnail?id=18hU1rW7RUfZ2P2qxojcQ35GNUjt-hkRA" alt="logo sd" style="width: 300px; height: auto;">
+              </div>
+              
+              <!-- Kolom Teks (Sebelah Kanan) -->
+              <div style="width: 80%; text-align: center;">
+                <h2 style="margin: 0; font-size: 20pt; font-weight: bold; font-family: Arial, sans-serif;">YAYASAN ANNIHAYAH</h2>
+                <h1 style="margin: 0; font-size: 28pt; font-weight: bold; font-family: Arial, sans-serif;">SDIT ANNIHAYAH</h1>
+                <p style="margin: 0; font-size: 9pt; font-weight: bold; font-family: Arial, sans-serif;">SK Izin Operasional : 503/4853/5/IPSS/X/DPMPTSP/2019 NPSN : 69993044</p>
+                <p style="margin: 0; font-size: 9pt; font-weight: bold; font-family: Arial, sans-serif;">Terakreditasi "B" SK BAN-SM Nomor : 1263/BAN-SM/SK/2022</p>
+                <p style="margin: 0; font-size: 9pt; font-weight: bold; font-family: Arial, sans-serif;">Dusun Krajan Satu Desa Sukamerta Kecamatan Rawamerta - Karawang</p>
+                <p style="margin: 0; font-size: 9pt; font-weight: bold; font-family: Arial, sans-serif;">Telp/WA : 0877-7722-2267 Email : annihayah.sdit@gmail.com</p>
+              </div>
+
+            </div>
+            <div style="border-top: 2px solid #008000; margin-top: -18px; margin-bottom: 10px;"></div>
+
+            <!-- TEMPLATE 1: SURAT KETERANGAN AKTIF -->
+            <div id="tpl-aktif" style="display: block;">
+              <h2 style="text-align: center; font-size: 14pt; font-weight: bold; text-decoration: underline; margin-bottom: 0;">SURAT KETERANGAN</h2>
+              <p style="text-align: center; margin-top: 0;">Nomor : <span class="v-skNomor"></span></p>
+              
+              <p style="text-align: justify;">Yang bertanda tangan dibawah ini, Kepala SDIT Annihayah Kecamatan Rawamerta Kabupaten Karawang menerangkan dengan sesungguhnya bahwa :</p>
+              
+              <table style="width: 100%; margin-left: 30px; margin-bottom: 10px;">
+                <tr><td width="30%">Nama Peserta Didik</td><td width="3%">:</td><td class="v-skNama" style="font-weight:bold;"></td></tr>
+                <tr><td>NIS</td><td>:</td><td class="v-skNis"></td></tr>
+                <tr><td>NISN</td><td>:</td><td class="v-skNisn"></td></tr>
+                <tr><td>Tempat, Tgl Lahir</td><td>:</td><td class="v-skTtl"></td></tr>
+                <tr><td>Jenis Kelamin</td><td>:</td><td class="v-skJk"></td></tr>
+                <tr><td>Kelas</td><td>:</td><td class="v-skKelas"></td></tr>
+              </table>
+
+              <p style="text-align: justify; text-indent: 40px;">Benar bahwa anak tersebut adalah Peserta Didik di SDIT ANNIHAYAH Korwilcambidik Rawamerta, dan AKTIF dikelas <span class="v-skKelas"></span> Tahun Ajaran <span class="v-skTahun"></span>. Demikian surat keterangan ini saya buat untuk dipergunakan sebagaimana mestinya.</p>
+              
+              <div style="margin-top: 40px; text-align: left; padding-left: 48%;">
+                <p><span class="v-skTempat"></span>, <span class="v-skTanggal"></span><br>Kepala SDIT Annihayah</p>
+                <br><br><br>
+                <p style="font-weight: bold; text-decoration: underline;">SELMA MEILA PUSPITA, S. Hum., M. Pd., Gr.</p>
+                <p>NIP. -</p>
+              </div>
+            </div>
+
+            <!-- TEMPLATE 2: SURAT TERIMA SISWA -->
+            <div id="tpl-terima" style="display: none;">
+              <h2 style="text-align: center; font-size: 14pt; font-weight: bold; text-decoration: underline; margin-bottom: 0;">SURAT KETERANGAN</h2>
+              <p style="text-align: center; margin-top: 0;">Nomor : <span class="v-skNomor"></span></p>
+              
+              <p style="text-align: justify;">Yang bertanda tangan dibawah ini, Kepala SDIT Annihayah Kecamatan Rawamerta Kabupaten Karawang menerangkan dengan sesungguhnya bahwa :</p>
+              
+              <table style="width: 100%; margin-left: 30px; margin-bottom: 10px;">
+                <tr><td width="30%">Nama</td><td width="3%">:</td><td class="v-skNama" style="font-weight:bold;"></td></tr>
+                <tr><td>NISN</td><td>:</td><td class="v-skNisn"></td></tr>
+                <tr><td>Tempat,tanggal lahir</td><td>:</td><td class="v-skTtl"></td></tr>
+                <tr><td>Sekolah Asal</td><td>:</td><td class="v-skAsal"></td></tr>
+              </table>
+
+              <p style="text-align: justify; text-indent: 40px;">Yang bersangkutan telah DITERIMA sebagai siswa kelas <span class="v-skKelas"></span> SDIT Annihayah Kecamatan Rawamerta Kabupaten Karawang Tahun Pelajaran <span class="v-skTahun"></span>.</p>
+              <p style="text-align: justify;">Demikian Surat Keterangan ini dibuat, supaya dapat dipergunakan sebagaimana mestinya.</p>
+
+              <div style="margin-top: 40px; text-align: left; padding-left: 56%;">
+                <p><span class="v-skTempat"></span>, <span class="v-skTanggal"></span><br>Kepala SDIT Annihayah,</p>
+                <br><br><br>
+                <p style="font-weight: bold; text-decoration: underline;">Selma Meila Puspita, S.Hum., M.Pd., Gr.</p>
+                <p>NIP. -</p>
+              </div>
+            </div>
+
+            <!-- TEMPLATE 3: SURAT PINDAH SEKOLAH -->
+            <div id="tpl-pindah" style="display: none; font-size: 11pt;">
+              <h2 style="text-align: center; font-size: 12pt; font-weight: bold; text-decoration: underline; margin-bottom: 0;">SURAT KETERANGAN PINDAH SEKOLAH</h2>
+              <p style="text-align: center; margin-top: 0;">Nomor : <span class="v-skNomor"></span></p>
+              
+              <p style="text-align: justify;">Yang bertanda tangan di bawah ini, Kepala SDIT Annihayah Kecamatan Rawamerta Kabupaten Karawang dengan ini menerangkan bahwa :</p>
+              
+              <table style="width: 100%; margin-left: 30px; margin-bottom: 5px;">
+                <tr><td width="30%">Nama</td><td width="3%">:</td><td class="v-skNama" style="font-weight:bold;"></td></tr>
+                <tr><td>NIS</td><td>:</td><td class="v-skNis"></td></tr>
+                <tr><td>NISN</td><td>:</td><td class="v-skNisn"></td></tr>
+                <tr><td>Jenis Kelamin</td><td>:</td><td class="v-skJk"></td></tr>
+                <tr><td>Kelas</td><td>:</td><td class="v-skKelas"></td></tr>
+              </table>
+
+              <p style="margin-bottom: 5px;">Sesuai dengan permohonan Pindah Sekolah orang tua / wali siswa :</p>
+              <table style="width: 100%; margin-left: 30px; margin-bottom: 10px;">
+                <tr><td width="30%">Nama Ayah</td><td width="3%">:</td><td class="v-skAyah"></td></tr>
+                <tr><td>Nama Ibu</td><td>:</td><td class="v-skIbu"></td></tr>
+              </table>
+
+              <p style="text-align: justify;">Telah mengajukan pindah ke <span class="v-skTujuan" style="font-weight:bold;"></span> atas permintaan orang tua / wali siswa dengan alasan <span class="v-skAlasan"></span>.</p>
+              <p style="text-align: justify;">Bersama ini kami sertakan Buku Laporan Hasil Pendidikan (Raport) yang bersangkutan. Demikian Keterangan ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
+
+              <div style="margin-top: 20px; text-align: left; padding-left: 60%;">
+                <p><span class="v-skTempat"></span>, <span class="v-skTanggal"></span><br>Kepala SDIT Annihayah</p>
+                <br><br>
+                <p style="font-weight: bold;">Selma Meila Puspita, S.Hum., M.Pd., Gr.<br>NIP. -</p>
+              </div>
+
+              <!-- Potongan Bawah / Balasan Surat Pindah -->
+              <div style="border-top: 1px dashed black; margin-top: 20px; padding-top: 10px; font-size: 10pt;">
+                <p style="margin-bottom: 5px;">Setelah anak diterima di sekolah tujuan, mohon blanko ini diisi dan dikembalikan kepada kami.</p>
+                <table style="width: 100%; line-height: 1.5;">
+                  <tr><td width="25%">Nama Sekolah</td><td width="2%">:</td><td>......................................................................................................</td></tr>
+                  <tr><td>Status Sekolah</td><td>:</td><td>......................................................................................................</td></tr>
+                  <tr><td>Alamat</td><td>:</td><td>......................................................................................................</td></tr>
+                  <tr><td>Desa / Kelurahan</td><td>:</td><td>......................................................................................................</td></tr>
+                  <tr><td>Kecamatan</td><td>:</td><td>......................................................................................................</td></tr>
+                  <tr><td>Kabupaten</td><td>:</td><td>......................................................................................................</td></tr>
+                  <tr><td>Provinsi</td><td>:</td><td>......................................................................................................</td></tr>
+                  <tr><td>Diterima Tanggal</td><td>:</td><td>......................................................................................................</td></tr>
+                </table>
+                <div style="text-align: right; margin-top: 10px; padding-right: 50px;">
+                  <p>Kepala Sekolah</p><br><br><p>.......................................</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- ========================================== -->
+    <!-- 11. RINCIAN BIAYA SISWA (MASTER BIAYA)     -->
+    <!-- ========================================== -->
+    <div id="page-rincian-biaya" class="page-content hidden h-full p-4 box-border">
+      <div class="flex gap-4 h-full">
+        <!-- KIRI: Form Input -->
+        <div class="w-1/2 bg-white p-6 rounded shadow overflow-y-auto no-print text-sm h-full flex flex-col">
+          <h2 class="text-xl font-bold mb-4">Master Rincian Biaya Siswa</h2>
+          <input type="hidden" id="rbBaris">
+          
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="font-semibold">Tahun Ajaran</label><input type="text" id="rbNama" placeholder="Cth: 2026/2027" class="w-full border p-1 rounded" oninput="updateRincianBiaya()"></div>
+              <div><label class="font-semibold">Kategori / Kelas</label><input type="text" id="rbKelas" placeholder="Cth: Kelas 1 Baru" class="w-full border p-1 rounded" oninput="updateRincianBiaya()"></div>
+            </div>
+            
+            <h3 class="font-bold border-b pb-1 mt-4 text-green-700">Komponen Biaya Tetap</h3>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="text-xs font-semibold">SPP (Per Bulan)</label><input type="number" id="rbSpp" class="w-full border p-1 rounded" oninput="updateRincianBiaya()"></div>
+              <div><label class="text-xs font-semibold">Seragam Sekolah</label><input type="number" id="rbSeragam" class="w-full border p-1 rounded" oninput="updateRincianBiaya()"></div>
+              <div><label class="text-xs font-semibold">Buku Paket / LKS</label><input type="number" id="rbBuku" class="w-full border p-1 rounded" oninput="updateRincianBiaya()"></div>
+              <div><label class="text-xs font-semibold">Kegiatan Tahunan</label><input type="number" id="rbKegiatan" class="w-full border p-1 rounded" oninput="updateRincianBiaya()"></div>
+              <div class="col-span-2"><label class="text-xs font-semibold">Biaya Gedung/Pangkal</label><input type="number" id="rbLain" class="w-full border p-1 rounded" oninput="updateRincianBiaya()"></div>
+            </div>
+
+            <!-- KOMPONEN TAMBAHAN BIAYA (DINAMIS) -->
+            <h3 class="font-bold border-b pb-1 mt-4 text-orange-600">Komponen Biaya Kustom</h3>
+            
+            <div id="rbTamContainer1" class="hidden grid-cols-3 gap-2 mt-2">
+              <div class="col-span-2"><label class="text-xs font-semibold">Nama Biaya Baru 1</label><input type="text" id="rbTamNama1" class="w-full border p-1 rounded border-orange-300" oninput="updateRincianBiaya()"></div>
+              <div><label class="text-xs font-semibold">Nominal (Rp)</label><input type="number" id="rbTamVal1" class="w-full border p-1 rounded border-orange-300" oninput="updateRincianBiaya()"></div>
+            </div>
+            <div id="rbTamContainer2" class="hidden grid-cols-3 gap-2 mt-2">
+              <div class="col-span-2"><label class="text-xs font-semibold">Nama Biaya Baru 2</label><input type="text" id="rbTamNama2" class="w-full border p-1 rounded border-orange-300" oninput="updateRincianBiaya()"></div>
+              <div><label class="text-xs font-semibold">Nominal (Rp)</label><input type="number" id="rbTamVal2" class="w-full border p-1 rounded border-orange-300" oninput="updateRincianBiaya()"></div>
+            </div>
+            <div id="rbTamContainer3" class="hidden grid-cols-3 gap-2 mt-2">
+              <div class="col-span-2"><label class="text-xs font-semibold">Nama Biaya Baru 3</label><input type="text" id="rbTamNama3" class="w-full border p-1 rounded border-orange-300" oninput="updateRincianBiaya()"></div>
+              <div><label class="text-xs font-semibold">Nominal (Rp)</label><input type="number" id="rbTamVal3" class="w-full border p-1 rounded border-orange-300" oninput="updateRincianBiaya()"></div>
+            </div>
+            
+            <button onclick="tambahKomponenRb()" class="w-full border-2 border-dashed border-blue-500 text-blue-600 font-bold py-2 rounded mt-2 hover:bg-blue-50 text-xs"><i class="fas fa-plus"></i> Tambah Komponen Biaya Lain</button>
+            
+            <h3 class="font-bold border-b pb-1 mt-4">Penutup Surat</h3>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="font-semibold">Tgl Cetak</label><input type="text" id="rbTanggal" placeholder="Cth: 15 Juli 2026" class="w-full border p-1 rounded" oninput="updateRincianBiaya()"></div>
+              <div><label class="font-semibold">TTD Kepala Sekolah</label><input type="text" id="rbKepsek" class="w-full border p-1 rounded" oninput="updateRincianBiaya()"></div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2 pt-4 border-t mt-4">
+            <div class="flex gap-2">
+              <button onclick="simpanUniversal('Data_Rincian_Biaya', 'rb')" class="w-1/2 bg-green-600 text-white p-2 rounded hover:bg-green-700 text-xs font-bold"><i class="fas fa-save"></i> Simpan Data</button>
+              <button onclick="resetFormUniversal('rb')" class="w-1/2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600 text-xs font-bold"><i class="fas fa-undo"></i> Batal</button>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="window.print()" class="w-1/2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 text-xs font-bold"><i class="fas fa-print"></i> Cetak A4</button>
+              <button onclick="prosesSimpanKeDrive('preview-rincian-biaya', 'Rincian_Biaya_Siswa')" class="w-1/2 bg-red-700 text-white p-2 rounded hover:bg-red-800 text-xs font-bold"><i class="fab fa-google-drive"></i> Simpan PDF Drive</button>
+            </div>
+          </div>
+
+          <div class="mt-4 border-t pt-4">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="font-bold text-sm">Arsip Rincian Tersimpan</h3>
+              <button onclick="muatUniversal('Data_Rincian_Biaya', 'rb')" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div class="overflow-x-auto h-32">
+              <table class="w-full text-left text-xs border-collapse" id="tabel-rb">
+                <thead class="bg-gray-200"><tr><th class="border p-1">Tahun Ajaran</th><th class="border p-1">Kelas</th><th class="border p-1">Aksi</th></tr></thead>
+                <tbody><tr><td colspan="3" class="text-center p-2 text-gray-500">Klik Refresh...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- KANAN: Preview Kertas A4 -->
+        <div class="w-1/2 flex flex-col h-full overflow-hidden">
+          <div class="preview-area rounded shadow flex-1 relative bg-gray-200">
+            <div id="preview-rincian-biaya" class="a4-paper block" style="font-family: Arial, sans-serif; font-size: 11pt; padding: 20mm; line-height: 1.5;">
+              
+              <!-- KOP SURAT SDIT ANNIHAYAH -->
+              <div style="border-bottom: 4px solid #008000; padding-bottom: 5px; margin-bottom: 20px; color: #008000; display: flex; align-items: center;">
+                <div style="width: 30%; text-align: center;">
+                  <img src="https://drive.google.com/thumbnail?id=18hU1rW7RUfZ2P2qxojcQ35GNUjt-hkRA" alt="logo sd" style="width: 310px; height: auto;">
+                </div>
+                <div style="width: 100%; text-align: center;">
+                  <h2 style="margin: 0; font-size: 20pt; font-weight: bold; font-family: Arial, sans-serif;">YAYASAN ANNIHAYAH</h2>
+                  <h1 style="margin: 0; font-size: 28pt; font-weight: bold; font-family: Arial, sans-serif;">SDIT ANNIHAYAH</h1>
+                  <p style="margin: 0; font-size: 9pt; font-weight: bold; font-family: Arial, sans-serif;">SK Izin Operasional : 503/4853/5/IPSS/X/DPMPTSP/2019 NPSN : 69993044</p>
+                  <p style="margin: 0; font-size: 9pt; font-weight: bold; font-family: Arial, sans-serif;">Terakreditasi "B" SK BAN-SM Nomor : 1263/BAN-SM/SK/2022</p>
+                  <p style="margin: 0; font-size: 9pt; font-weight: bold; font-family: Arial, sans-serif;">Dusun Krajan Satu Desa Sukamerta Kec. Rawamerta - Karawang</p>
+                </div>
+              </div>
+              <div style="border-top: 2px solid #008000; margin-top: -18px; margin-bottom: 20px;"></div>
+
+              <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="font-size: 14pt; font-weight: bold; margin: 0; text-decoration: underline;">RINCIAN BIAYA ADMINISTRASI SISWA</h3>
+                <p style="margin: 5px 0 0 0;">Tahun Ajaran <span class="v-rbNama font-bold">...</span> - <span class="v-rbKelas font-bold">...</span></p>
+              </div>
+
+              <p style="margin-bottom: 15px;">Berikut disampaikan rincian komponen biaya pendidikan siswa pada tahun ajaran yang bersangkutan:</p>
+
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;" border="1" cellpadding="8">
+                <thead>
+                  <tr style="background-color: #f3f4f6; font-weight: bold; text-align: center;">
+                    <td width="10%">No</td><td width="60%">Komponen Pembiayaan</td><td width="30%">Nominal (Rp)</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="trRbSpp" style="display: none;"><td align="center">1</td><td>SPP (Pembinaan Pendidikan) / Bulan</td><td align="right" class="v-rbSpp">0</td></tr>
+                  <tr id="trRbSeragam" style="display: none;"><td align="center">2</td><td>Seragam Sekolah (Paket)</td><td align="right" class="v-rbSeragam">0</td></tr>
+                  <tr id="trRbBuku" style="display: none;"><td align="center">3</td><td>Buku Paket / LKS</td><td align="right" class="v-rbBuku">0</td></tr>
+                  <tr id="trRbKegiatan" style="display: none;"><td align="center">4</td><td>Kegiatan Tahunan</td><td align="right" class="v-rbKegiatan">0</td></tr>
+                  <tr id="trRbLain" style="display: none;"><td align="center">5</td><td>Biaya Gedung / Pangkal</td><td align="right" class="v-rbLain">0</td></tr>
+                  
+                  <!-- BARIS DINAMIS -->
+                  <tr id="trRbTam1" style="display: none;"><td align="center">6</td><td id="prevRbTamNama1">-</td><td align="right" class="v-rbTamVal1">0</td></tr>
+                  <tr id="trRbTam2" style="display: none;"><td align="center">7</td><td id="prevRbTamNama2">-</td><td align="right" class="v-rbTamVal2">0</td></tr>
+                  <tr id="trRbTam3" style="display: none;"><td align="center">8</td><td id="prevRbTamNama3">-</td><td align="right" class="v-rbTamVal3">0</td></tr>
+                </tbody>
+                <tfoot>
+                  <tr style="font-weight: bold; background-color: #e5e7eb;">
+                    <td colspan="2" align="right">TOTAL BIAYA KESELURUHAN</td>
+                    <td align="right">Rp <span id="prevRbTotal">0</span></td>
+                  </tr>
+                </tfoot>
+              </table>
+
+              <div style="margin-top: 50px; display: flex; justify-content: flex-end;">
+                <div style="text-align: center; width: 250px;">
+                  <p>Karawang, <span class="v-rbTanggal"></span></p>
+                  <p>Kepala Sekolah,</p>
+                  <br><br><br><br>
+                  <p style="font-weight: bold; text-decoration: underline;" class="v-rbKepsek"></p>
+                  <p>NIP. -</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 4. PEMBIAYAAN (KWITANSI & SLIP GAJI)       -->
+    <!-- ========================================== -->
+    <div id="page-pembiayaan" class="page-content hidden h-full p-4 box-border">
+      <div class="flex gap-4 h-full">
+        
+        <!-- KIRI: Form Input Pembiayaan -->
+        <div class="w-1/2 bg-white p-6 rounded shadow overflow-y-auto no-print text-sm h-full flex flex-col">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold" id="formByTitle">Data Pembiayaan</h2>
+            <select id="byJenis" class="border-2 border-blue-500 p-1 rounded font-bold text-blue-700" onchange="switchPembiayaan()">
+              <option value="siswa">Biaya Administrasi Siswa</option>
+              <option value="guru">Honorarium Guru</option>
+            </select>
+          </div>
+          
+          <input type="hidden" id="byBaris">
+          
+          <!-- FORM SISWA -->
+          <div id="formBySiswa" class="space-y-3 block">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="font-semibold">Nama Siswa</label>
+                <select id="byNamaSiswa" class="w-full border p-1 rounded font-bold" onchange="updatePembiayaan()">
+                  <option value="">-- Pilih Siswa Aktif --</option>
+                </select>
+              </div>
+              <div><label class="font-semibold">Kelas</label><input type="text" id="byKelas" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+            </div>
+            <h3 class="font-bold border-b pb-1 mt-2 text-green-700">Rincian Pembayaran</h3>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="text-xs">SPP</label><input type="number" id="bySpp" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+              <div><label class="text-xs">Seragam</label><input type="number" id="bySeragam" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+              <div><label class="text-xs">Kegiatan Tahunan</label><input type="number" id="byTahunan" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+              <div><label class="text-xs">Kegiatan Ekskul</label><input type="number" id="byEkskul" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+              <div><label class="text-xs">Uang Bangunan/Lainnya</label><input type="number" id="byBangunan" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+            </div>
+            <div><label class="font-semibold text-xs">Terbilang</label><input type="text" id="byTerbilangSiswa" placeholder="Cth: Lima Ratus Ribu Rupiah" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+          </div>
+
+          <!-- FORM GURU -->
+          <div id="formByGuru" class="space-y-3 hidden">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="font-semibold">Nama Guru</label>
+                <select id="byNamaGuru" class="w-full border p-1 rounded font-bold" onchange="updatePembiayaan()">
+                  <option value="">-- Pilih Guru --</option>
+                </select>
+              </div>
+              <div><label class="font-semibold">Jabatan/Bulan</label><input type="text" id="byBulanJabatan" placeholder="Cth: Wali Kelas / Oktober 2026" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+            </div>
+            <h3 class="font-bold border-b pb-1 mt-2 text-blue-700">Rincian Honor & Potongan</h3>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="text-xs">Gaji Pokok</label><input type="number" id="byGapok" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+              <div><label class="text-xs">Tunjangan Transport</label><input type="number" id="byTransport" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+              <div><label class="text-xs">Honor Kegiatan</label><input type="number" id="byKegiatan" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+              <div><label class="text-xs text-red-600">Potongan/Kas</label><input type="number" id="byPotongan" class="w-full border p-1 rounded border-red-300" oninput="updatePembiayaan()"></div>
+            </div>
+          </div>
+
+          <!-- INPUT UMUM -->
+          <div class="grid grid-cols-2 gap-2 mt-4">
+            <div><label class="font-semibold text-xs">Tanggal Cetak</label><input type="date" id="byTanggal" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+            <div><label class="font-semibold text-xs">Penerima/Bendahara</label><input type="text" id="byPetugas" value="Bendahara Sekolah" class="w-full border p-1 rounded" oninput="updatePembiayaan()"></div>
+          </div>
+
+          <!-- TOMBOL SIMPAN & TABEL REKAP -->
+          <div class="flex flex-col gap-2 pt-4 border-t mt-4">
+            <div class="flex gap-2">
+              <button onclick="simpanUniversal('Data_Pembiayaan', 'by')" class="w-1/2 bg-green-600 text-white p-2 rounded hover:bg-green-700 text-xs font-bold"><i class="fas fa-save"></i> Simpan Data</button>
+              <button onclick="resetFormUniversal('by')" class="w-1/2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600 text-xs font-bold"><i class="fas fa-undo"></i> Batal</button>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="window.print()" class="w-1/2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 text-xs font-bold"><i class="fas fa-print"></i> Cetak A4</button>
+              <button onclick="prosesSimpanKeDrive(document.getElementById('byJenis').value === 'siswa' ? 'preview-kwitansi' : 'preview-slip', 'Pembiayaan')" class="w-1/2 bg-red-700 text-white p-2 rounded hover:bg-red-800 text-xs font-bold"><i class="fab fa-google-drive"></i> Simpan PDF Drive</button>
+            </div>
+          </div>
+
+          <div class="mt-4 border-t pt-4">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="font-bold text-sm">Riwayat Pembiayaan</h3>
+              <button onclick="muatUniversal('Data_Pembiayaan', 'by')" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div class="overflow-x-auto h-32">
+              <table class="w-full text-left text-xs border-collapse" id="tabel-by">
+                <thead class="bg-gray-200"><tr><th class="border p-1">Nama</th><th class="border p-1">Aksi</th></tr></thead>
+                <tbody><tr><td colspan="2" class="text-center p-2 text-gray-500">Klik Refresh...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- KANAN: Preview A4 -->
+        <div class="w-1/2 flex flex-col h-full overflow-hidden">
+          <div class="preview-area rounded shadow flex-1 relative bg-gray-200">
+            
+            <!-- TEMPLATE 1: KWITANSI ISLAMI (SETENGAH A4) -->
+            <div id="preview-kwitansi" class="a4-paper block" style="min-height: 148mm; font-family: 'Times New Roman', serif; padding: 15mm; position: relative;">
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.1; z-index: 1;">
+                <img src="https://drive.google.com/thumbnail?id=18hU1rW7RUfZ2P2qxojcQ35GNUjt-hkRA" alt="logo sd" style="width: 300px;">
+              </div>
+              
+              <div style="border: 4px double #166534; padding: 20px; height: 100%; position: relative; z-index: 2; border-radius: 10px; background-color: rgba(255,255,255,0.85);">
+                <div style="text-align: center; border-bottom: 2px solid #166534; padding-bottom: 10px; margin-bottom: 20px;">
+                  <h1 style="color: #166534; font-size: 18pt; font-weight: bold; margin: 0; font-family: Arial, sans-serif;">KWITANSI PEMBAYARAN</h1>
+                  <h2 style="color: #15803d; font-size: 14pt; margin: 0; font-family: Arial, sans-serif;">SDIT ANNIHAYAH</h2>
+                </div>
+                
+                <table style="width: 100%; font-size: 12pt; line-height: 1.8;">
+                  <tr><td width="30%">Telah Diterima Dari</td><td width="5%">:</td><td class="v-byNamaSiswa font-bold"></td></tr>
+                  <tr><td>Kelas</td><td>:</td><td class="v-byKelas"></td></tr>
+                  <tr><td>Uang Sejumlah</td><td>:</td><td style="background-color: #dcfce7; padding: 0 10px; font-style: italic;" class="v-byTerbilangSiswa"></td></tr>
+                  <tr><td valign="top">Untuk Pembayaran</td><td valign="top">:</td>
+                    <td>
+                      <ul style="margin: 0; padding-left: 20px;">
+                        <li id="liBySpp" style="display: none;">SPP: Rp <span class="v-bySpp">0</span></li>
+                        <li id="liBySeragam" style="display: none;">Seragam: Rp <span class="v-bySeragam">0</span></li>
+                        <li id="liByTahunan" style="display: none;">Kegiatan Tahunan: Rp <span class="v-byTahunan">0</span></li>
+                        <li id="liByEkskul" style="display: none;">Kegiatan Ekskul: Rp <span class="v-byEkskul">0</span></li>
+                        <li id="liByBangunan" style="display: none;">Lain-lain: Rp <span class="v-byBangunan">0</span></li>
+                      </ul>
+                    </td>
+                  </tr>
+                </table>
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px;">
+                  <div style="background-color: #166534; color: white; padding: 10px 20px; font-size: 14pt; font-weight: bold; border-radius: 5px;">
+                    TOTAL: Rp <span id="prevByTotalSiswa">0</span>
+                  </div>
+                  <div style="text-align: center;">
+                    <p>Karawang, <span class="v-byTanggal"></span></p>
+                    <p>Penerima,</p>
+                    <br><br>
+                    <p style="font-weight: bold; text-decoration: underline;" class="v-byPetugas"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TEMPLATE 2: SLIP GAJI GURU (SETENGAH A4) -->
+            <div id="preview-slip" class="a4-paper hidden" style="min-height: 148mm; font-family: Arial, sans-serif; padding: 15mm; position: relative;">
+              <div style="border: 2px solid black; padding: 20px; height: 100%;">
+                <div style="text-align: center; border-bottom: 3px double black; padding-bottom: 10px; margin-bottom: 20px;">
+                  <h1 style="font-size: 16pt; font-weight: bold; margin: 0;">SLIP HONORARIUM GURU</h1>
+                  <h2 style="font-size: 14pt; margin: 0;">SDIT ANNIHAYAH</h2>
+                </div>
+                
+                <table style="width: 100%; font-size: 11pt; margin-bottom: 20px;">
+                  <tr><td width="20%">Nama Guru</td><td width="3%">:</td><td class="v-byNamaGuru font-bold"></td><td width="20%">Bulan</td><td width="3%">:</td><td class="v-byBulanJabatan"></td></tr>
+                </table>
+
+                <table style="width: 100%; font-size: 11pt; border-collapse: collapse;" border="1" cellpadding="5">
+                  <tr style="background-color: #e5e7eb; font-weight: bold;"><td width="50%" align="center">PENERIMAAN</td><td width="50%" align="center">POTONGAN</td></tr>
+                  <tr>
+                    <td valign="top">
+                      <table style="width: 100%;">
+                        <tr><td>Gaji Pokok</td><td align="right">Rp <span class="v-byGapok">0</span></td></tr>
+                        <tr><td>Transport</td><td align="right">Rp <span class="v-byTransport">0</span></td></tr>
+                        <tr><td>Kegiatan</td><td align="right">Rp <span class="v-byKegiatan">0</span></td></tr>
+                      </table>
+                    </td>
+                    <td valign="top">
+                      <table style="width: 100%;">
+                        <tr><td>Potongan/Kas</td><td align="right">Rp <span class="v-byPotongan">0</span></td></tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr style="font-weight: bold;">
+                    <td>Total Penerimaan: <span style="float:right;">Rp <span id="prevBySubPenerimaan">0</span></span></td>
+                    <td>Total Potongan: <span style="float:right;">Rp <span id="prevBySubPotongan">0</span></span></td>
+                  </tr>
+                  <tr style="background-color: #dcfce7; font-weight: bold; font-size: 12pt;">
+                    <td colspan="2" align="center">GAJI BERSIH (TAKE HOME PAY): Rp <span id="prevByTotalGuru">0</span></td>
+                  </tr>
+                </table>
+
+                <div style="display: flex; justify-content: space-between; margin-top: 30px; font-size: 11pt;">
+                  <div style="text-align: center;"><p>Penerima,</p><br><br><br><p style="text-decoration: underline;" class="v-byNamaGuru"></p></div>
+                  <div style="text-align: center;"><p>Karawang, <span class="v-byTanggal"></span></p><p>Bendahara,</p><br><br><br><p style="text-decoration: underline;" class="v-byPetugas"></p></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 5. ABSENSI FACE ID (KAMERA & RIWAYAT)      -->
+    <!-- ========================================== -->
+    <!-- ========================================== -->
+    <!-- 5. ABSENSI FACE ID (KAMERA & RIWAYAT)      -->
+    <!-- ========================================== -->
+    <div id="page-absensi" class="page-content hidden h-full p-6 box-border overflow-y-auto">
+      <h2 class="text-2xl font-bold mb-6 text-gray-800"><i class="fas fa-camera"></i> Absensi Kehadiran</h2>
+      
+      <!-- BUNGKUSAN UTAMA (Atas Bawah) -->
+      <div class="flex flex-col gap-6">
+        
+        <!-- BAGIAN ATAS: Kamera (Kiri) & Alternatif (Kanan) -->
+        <div class="flex flex-col md:flex-row gap-6">
+          
+          <!-- ATAS KIRI: Kamera & Area Deteksi -->
+          <div class="w-full md:w-1/2 bg-white p-6 rounded shadow flex flex-col items-center border-t-4 border-blue-500">
+             <div class="relative w-full max-w-md bg-gray-900 rounded-lg overflow-hidden border-2 border-gray-300 mb-4 flex items-center justify-center" style="aspect-ratio: 4/3;">
+               <video id="video-stream" class="w-full h-full object-cover transform scale-x-[-1]" autoplay playsinline></video>
+               <p id="kamera-mati-teks" class="absolute text-gray-400 font-bold">Kamera Nonaktif</p>
+               <div class="absolute inset-0 bg-blue-500 opacity-30 hidden" id="scan-overlay"></div>
+             </div>
+             
+             <div class="flex gap-2 w-full max-w-md">
+               <button onclick="startCamera()" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold shadow hover:bg-blue-700"><i class="fas fa-play"></i> Hidupkan Kamera</button>
+               <button onclick="stopCamera()" class="flex-1 bg-red-600 text-white px-4 py-2 rounded text-sm font-bold shadow hover:bg-red-700"><i class="fas fa-stop"></i> Matikan Kamera</button>
+             </div>
+          </div>
+
+          <!-- ATAS KANAN: Pilihan Absensi Alternatif -->
+          <div class="w-full md:w-1/2 bg-white p-6 rounded shadow flex flex-col border-t-4 border-orange-500">
+             <h3 class="font-bold text-lg mb-4 text-center text-blue-800"><i class="fas fa-keyboard"></i> Pilihan Absensi Alternatif</h3>
+             
+             <!-- Pilihan Metode -->
+             <select id="metodeAbsen" class="w-full border p-2 rounded text-sm mb-4 font-semibold bg-gray-50" onchange="switchMetodeAbsen()">
+               <option value="manual">1. Input Manual (Nama & Peran)</option>
+               <option value="qr">2. Scan QR / Barcode</option>
+               <option value="pin">3. Gunakan PIN / Password</option>
+               <option value="jari">4. Sensor Sidik Jari (Biometrik)</option>
+             </select>
+
+             <!-- Form 1: Input Manual -->
+             <div id="absenManual" class="grid grid-cols-2 gap-3 mb-4">
+                <input type="text" id="absenNama" placeholder="Ketik Nama atau NISN..." class="border p-2 rounded text-sm col-span-2">
+                <select id="absenPeran" class="border p-2 rounded text-sm col-span-2">
+                  <option value="Siswa">Siswa</option>
+                  <option value="Guru">Guru</option>
+                </select>
+             </div>
+
+             <!-- Form 2: Input QR -->
+             <div id="absenQR" class="hidden mb-4">
+                <input type="text" id="absenDataQR" placeholder="Arahkan kursor ke sini & scan QR..." class="border p-2 rounded text-sm w-full focus:ring-2 focus:ring-blue-500" onkeypress="handleQR(event)">
+                <p class="text-xs text-gray-500 mt-2">*Gunakan alat scanner barcode fisik, atau ketik kode ID lalu tekan Enter.</p>
+             </div>
+
+             <!-- Form 3: Input PIN -->
+             <div id="absenPIN" class="hidden grid-cols-2 gap-3 mb-4">
+                <input type="text" id="absenUserPin" placeholder="ID Pengguna (NISN/Nama)" class="border p-2 rounded text-sm col-span-2">
+                <input type="password" id="absenKodePin" placeholder="Masukkan Kata Sandi / PIN" class="border p-2 rounded text-sm col-span-2">
+             </div>
+
+             <!-- Form 4: Sidik Jari -->
+             <div id="absenJari" class="hidden text-center py-4 mb-4">
+                <i class="fas fa-fingerprint text-6xl text-gray-400 hover:text-blue-600 cursor-pointer transition-colors" onclick="prosesAbsensiAlternatif()"></i>
+                <p class="text-xs text-gray-500 mt-3">Klik ikon sidik jari atau tempelkan jari pada sensor perangkat.</p>
+             </div>
+
+             <!-- Tombol Proses (Terkunci di paling bawah panel) -->
+             <div class="mt-auto">
+               <button id="btnProsesAbsen" onclick="prosesAbsensiAlternatif()" class="w-full bg-green-600 text-white px-4 py-3 rounded text-sm font-bold hover:bg-green-700 shadow">Proses Kehadiran</button>
+             </div>
+          </div>
+          
+        </div>
+
+        <!-- BAGIAN BAWAH: Tabel Riwayat Absensi (Lebar Penuh) -->
+        <div class="w-full bg-white p-6 rounded shadow border-t-4 border-green-500 mb-8">
+           <div class="flex justify-between items-center mb-4 border-b pb-2">
+             <h3 class="text-lg font-bold"><i class="fas fa-history"></i> Riwayat Kehadiran Hari Ini</h3>
+             <button onclick="muatRiwayatAbsensi()" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-bold hover:bg-blue-200 shadow-sm"><i class="fas fa-sync-alt"></i> Segarkan Data</button>
+           </div>
+           
+           <div class="overflow-x-auto max-h-64">
+             <table class="w-full text-left text-sm border-collapse" id="tabel-absensi">
+               <thead class="bg-gray-100 sticky top-0 shadow-sm">
+                 <tr>
+                   <th class="p-3 border-b text-gray-700">Nama Lengkap</th>
+                   <th class="p-3 border-b text-center text-gray-700">Peran</th>
+                   <th class="p-3 border-b text-center text-gray-700">Tanggal</th>
+                   <th class="p-3 border-b text-center text-gray-700">Jam Masuk</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 <tr><td colspan="4" class="p-4 text-center text-gray-500">Memuat riwayat kehadiran dari server...</td></tr>
+               </tbody>
+             </table>
+           </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 6. NILAI RAPOR (FORMAT SDIT ANNIHAYAH SMT 2)-->
+    <!-- ========================================== -->
+    <div id="page-rapor" class="page-content hidden h-full">
+      <div class="flex h-full">
+        <!-- Form Kiri -->
+        <div class="w-1/2 bg-white p-6 rounded shadow overflow-y-auto no-print text-sm">
+          <h2 class="text-xl font-bold mb-4">Input Nilai Rapor (Akhir Semester)</h2>
+          <div class="space-y-3">
+            <h3 class="font-bold border-b pb-1">Identitas Siswa</h3>
+            <div><label class="font-semibold">Nama Siswa</label><input type="text" id="rpNama" class="w-full border p-1 rounded" oninput="updateRapor()"></div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="font-semibold">NIS/NISN</label><input type="text" id="rpNis" class="w-full border p-1 rounded" oninput="updateRapor()"></div>
+              <div><label class="font-semibold">Kelas</label><input type="text" id="rpKelas" class="w-full border p-1 rounded" oninput="updateRapor()"></div>
+              <div>
+                <label class="font-semibold">Semester</label>
+                <select id="rpSemester" class="w-full border p-1 rounded" onchange="updateRapor()">
+                  <option value="1">1 (Ganjil)</option>
+                  <option value="2" selected>2 (Genap)</option>
+                </select>
+              </div>
+              <div><label class="font-semibold">Tahun Pelajaran</label><input type="text" id="rpTahun" class="w-full border p-1 rounded" oninput="updateRapor()"></div>
+            </div>
+
+            <h3 class="font-bold border-b pb-1 mt-4">Nilai & Capaian Kompetensi</h3>
+            <div class="bg-gray-50 p-2 rounded border"><label class="font-bold text-xs">1. Pendidikan Agama Islam</label><input type="number" id="rpValPai" placeholder="Nilai" class="w-full border p-1 rounded mb-1" oninput="updateRapor()"><textarea id="rpDescPai" placeholder="Deskripsi..." class="w-full border p-1 rounded text-xs h-12" oninput="updateRapor()"></textarea></div>
+            <div class="bg-gray-50 p-2 rounded border"><label class="font-bold text-xs">2. Pendidikan Pancasila</label><input type="number" id="rpValPp" placeholder="Nilai" class="w-full border p-1 rounded mb-1" oninput="updateRapor()"><textarea id="rpDescPp" placeholder="Deskripsi..." class="w-full border p-1 rounded text-xs h-12" oninput="updateRapor()"></textarea></div>
+            <div class="bg-gray-50 p-2 rounded border"><label class="font-bold text-xs">3. Bahasa Indonesia</label><input type="number" id="rpValBindo" placeholder="Nilai" class="w-full border p-1 rounded mb-1" oninput="updateRapor()"><textarea id="rpDescBindo" placeholder="Deskripsi..." class="w-full border p-1 rounded text-xs h-12" oninput="updateRapor()"></textarea></div>
+            <div class="bg-gray-50 p-2 rounded border"><label class="font-bold text-xs">4. Matematika (Umum)</label><input type="number" id="rpValMtk" placeholder="Nilai" class="w-full border p-1 rounded mb-1" oninput="updateRapor()"><textarea id="rpDescMtk" placeholder="Deskripsi..." class="w-full border p-1 rounded text-xs h-12" oninput="updateRapor()"></textarea></div>
+            <div class="bg-gray-50 p-2 rounded border"><label class="font-bold text-xs">5. IPAS</label><input type="number" id="rpValIpas" placeholder="Nilai" class="w-full border p-1 rounded mb-1" oninput="updateRapor()"><textarea id="rpDescIpas" placeholder="Deskripsi..." class="w-full border p-1 rounded text-xs h-12" oninput="updateRapor()"></textarea></div>
+            <div class="bg-gray-50 p-2 rounded border"><label class="font-bold text-xs">6. PJOK</label><input type="number" id="rpValPjok" placeholder="Nilai" class="w-full border p-1 rounded mb-1" oninput="updateRapor()"><textarea id="rpDescPjok" placeholder="Deskripsi..." class="w-full border p-1 rounded text-xs h-12" oninput="updateRapor()"></textarea></div>
+            <div class="bg-gray-50 p-2 rounded border"><label class="font-bold text-xs">7. Seni Budaya</label><input type="number" id="rpValSeni" placeholder="Nilai" class="w-full border p-1 rounded mb-1" oninput="updateRapor()"><textarea id="rpDescSeni" placeholder="Deskripsi..." class="w-full border p-1 rounded text-xs h-12" oninput="updateRapor()"></textarea></div>
+            <div class="bg-gray-50 p-2 rounded border"><label class="font-bold text-xs">8. Bahasa Inggris</label><input type="number" id="rpValBing" placeholder="Nilai" class="w-full border p-1 rounded mb-1" oninput="updateRapor()"><textarea id="rpDescBing" placeholder="Deskripsi..." class="w-full border p-1 rounded text-xs h-12" oninput="updateRapor()"></textarea></div>
+            <div class="bg-gray-50 p-2 rounded border"><label class="font-bold text-xs">9. Muatan Lokal (Bahasa Sunda)</label><input type="number" id="rpValMulok" placeholder="Nilai" class="w-full border p-1 rounded mb-1" oninput="updateRapor()"><textarea id="rpDescMulok" placeholder="Deskripsi..." class="w-full border p-1 rounded text-xs h-12" oninput="updateRapor()"></textarea></div>
+
+            <h3 class="font-bold border-b pb-1 mt-4">Ekstrakurikuler & Kehadiran</h3>
+            <div class="grid grid-cols-3 gap-1">
+              <div><label class="text-xs">Nama Ekskul</label><input type="text" id="rpEkskulNama" class="w-full border p-1 rounded text-xs" oninput="updateRapor()"></div>
+              <div><label class="text-xs">Predikat</label><input type="text" id="rpEkskulPredikat" class="w-full border p-1 rounded text-xs" oninput="updateRapor()"></div>
+              <div><label class="text-xs">Keterangan</label><input type="text" id="rpEkskulKet" class="w-full border p-1 rounded text-xs" oninput="updateRapor()"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mt-2">
+              <div><label class="text-xs">Sakit</label><input type="number" id="rpSakit" class="w-full border p-1 rounded" oninput="updateRapor()"></div>
+              <div><label class="text-xs">Izin</label><input type="number" id="rpIzin" class="w-full border p-1 rounded" oninput="updateRapor()"></div>
+              <div><label class="text-xs">Tanpa Keterangan</label><input type="number" id="rpAlpa" class="w-full border p-1 rounded" oninput="updateRapor()"></div>
+            </div>
+
+            <h3 class="font-bold border-b pb-1 mt-4">Catatan & TTD</h3>
+            <div><label class="font-semibold text-xs">Catatan Wali Kelas</label><textarea id="rpCatatan" class="w-full border p-1 rounded h-12" oninput="updateRapor()"></textarea></div>
+            
+            <div id="formKenaikanContainer" class="mt-2">
+              <label class="font-semibold text-xs text-blue-600">Keterangan Kenaikan Kelas (Smt 2)</label>
+              <input type="text" id="rpKenaikan" placeholder="Cth: Naik ke kelas VI" class="w-full border p-1 rounded border-blue-400" oninput="updateRapor()">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 mt-2">
+              <div><label class="text-xs">Tgl Cetak</label><input type="text" id="rpTanggal" value="24 Juni 2026" class="w-full border p-1 rounded" oninput="updateRapor()"></div>
+              <div><label class="text-xs">Wali Kelas</label><input type="text" id="rpWali" class="w-full border p-1 rounded" oninput="updateRapor()"></div>
+              <div class="col-span-2"><label class="text-xs">Kepala Sekolah</label><input type="text" id="rpKepsek" class="w-full border p-1 rounded" oninput="updateRapor()"></div>
+            </div>
+            
+            <!-- TOMBOL SIMPAN, CETAK, & TABEL REKAP RAPOR -->
+            <input type="hidden" id="rpBaris">
+            <div class="flex flex-col gap-2 pt-4 border-t mt-4">
+              <div class="flex gap-2">
+                <button onclick="simpanUniversal('Data_Rapor', 'rp')" class="w-1/2 bg-green-600 text-white p-2 rounded hover:bg-green-700 text-xs font-bold"><i class="fas fa-save"></i> Simpan Data</button>
+                <button onclick="resetFormUniversal('rp')" class="w-1/2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600 text-xs font-bold"><i class="fas fa-undo"></i> Batal</button>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="window.print()" class="w-1/2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 text-xs font-bold"><i class="fas fa-print"></i> Cetak A4</button>
+                <button onclick="prosesSimpanKeDrive('preview-rapor', 'Rapor_Siswa')" class="w-1/2 bg-red-700 text-white p-2 rounded hover:bg-red-800 text-xs font-bold"><i class="fab fa-google-drive"></i> Simpan PDF Drive</button>
+              </div>
+            </div>
+
+            <!-- Tabel Data Rapor -->
+            <div class="mt-4 border-t pt-4">
+              <div class="flex justify-between items-center mb-2">
+                <h3 class="font-bold text-sm">Data Rapor Tersimpan</h3>
+                <button onclick="muatUniversal('Data_Rapor', 'rp')" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs"><i class="fas fa-sync-alt"></i> Refresh</button>
+              </div>
+              <div class="overflow-x-auto h-32">
+                <table class="w-full text-left text-xs border-collapse" id="tabel-rp">
+                  <thead class="bg-gray-200"><tr><th class="border p-1">Nama Siswa</th><th class="border p-1">Aksi</th></tr></thead>
+                  <tbody><tr><td colspan="2" class="text-center p-2 text-gray-500">Klik Refresh...</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Preview Kanan (Kertas A4) -->
+        <div class="w-2/3 preview-area">
+          <div class="a4-paper" style="font-family: 'Times New Roman', Times, serif; font-size: 10pt; padding: 15mm 20mm; line-height: 1.2;">
+            <table style="width: 100%; margin-bottom: 10px; font-weight: bold; font-size: 9pt;">
+              <tr><td width="15%">Nama</td><td width="2%">:</td><td width="38%" id="prevRpNama"></td><td width="15%">Kelas</td><td width="2%">:</td><td id="prevRpKelas"></td></tr>
+              <tr><td>NIS/NISN</td><td>:</td><td id="prevRpNis"></td><td>Semester</td><td>:</td><td id="prevRpSemester">2</td></tr>
+              <tr><td>Nama Sekolah</td><td>:</td><td>SDIT ANNIHAYAH</td><td>Tahun Pelajaran</td><td>:</td><td id="prevRpTahun"></td></tr>
+              <tr><td>Alamat</td><td>:</td><td colspan="4">Dusun Krajan Satu RT 007/004</td></tr>
+            </table>
+
+            <h2 style="text-align: center; font-size: 12pt; font-weight: bold; margin: 10px 0;">LAPORAN HASIL BELAJAR</h2>
+
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; text-align: left; font-size: 9pt;" border="1" cellpadding="3">
+              <tr style="background-color: #f3f4f6; font-weight: bold; text-align: center;"><td width="3%">No</td><td width="22%">Mata Pelajaran</td><td width="10%">Nilai Akhir</td><td width="65%">Capaian Kompetensi</td></tr>
+              <tr><td align="center" valign="top">1</td><td valign="top">Pendidikan Agama Islam<br>dan Budi Pekerti</td><td align="center" valign="top" id="prevRpValPai"></td><td valign="top" id="prevRpDescPai"></td></tr>
+              <tr><td align="center" valign="top">2</td><td valign="top">Pendidikan Pancasila dan<br>Kewarganegaraan</td><td align="center" valign="top" id="prevRpValPp"></td><td valign="top" id="prevRpDescPp"></td></tr>
+              <tr><td align="center" valign="top">3</td><td valign="top">Bahasa Indonesia</td><td align="center" valign="top" id="prevRpValBindo"></td><td valign="top" id="prevRpDescBindo"></td></tr>
+              <tr><td align="center" valign="top">4</td><td valign="top">Matematika (Umum)</td><td align="center" valign="top" id="prevRpValMtk"></td><td valign="top" id="prevRpDescMtk"></td></tr>
+              <tr><td align="center" valign="top">5</td><td valign="top">Ilmu Pengetahuan Alam<br>dan Sosial (IPAS)</td><td align="center" valign="top" id="prevRpValIpas"></td><td valign="top" id="prevRpDescIpas"></td></tr>
+              <tr><td align="center" valign="top">6</td><td valign="top">Pendidikan Jasmani,<br>Olahraga, dan Kesehatan</td><td align="center" valign="top" id="prevRpValPjok"></td><td valign="top" id="prevRpDescPjok"></td></tr>
+              <tr><td align="center" valign="top">7</td><td valign="top">Seni Budaya</td><td align="center" valign="top" id="prevRpValSeni"></td><td valign="top" id="prevRpDescSeni"></td></tr>
+              <tr><td align="center" valign="top">8</td><td valign="top">Bahasa Inggris</td><td align="center" valign="top" id="prevRpValBing"></td><td valign="top" id="prevRpDescBing"></td></tr>
+              <tr><td align="center" valign="top">9</td><td valign="top">Muatan Lokal Bahasa<br>Daerah</td><td align="center" valign="top" id="prevRpValMulok"></td><td valign="top" id="prevRpDescMulok"></td></tr>
+            </table>
+
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 9pt;" border="1" cellpadding="3">
+              <tr style="background-color: #f3f4f6; font-weight: bold; text-align: center;"><td width="5%">No</td><td width="35%">Kegiatan Ekstrakurikuler</td><td width="15%">Predikat</td><td width="45%">Keterangan</td></tr>
+              <tr><td align="center">1</td><td id="prevRpEkskulNama"></td><td align="center" id="prevRpEkskulPredikat"></td><td id="prevRpEkskulKet"></td></tr>
+            </table>
+
+            <div style="width: 40%; margin-bottom: 10px; font-size: 9pt;">
+              <table style="width: 100%; border-collapse: collapse;" border="1" cellpadding="2">
+                <tr><td width="50%">Sakit</td><td width="50%" align="center"><span id="prevRpSakit">0</span> hari</td></tr>
+                <tr><td>Izin</td><td align="center"><span id="prevRpIzin">0</span> hari</td></tr>
+                <tr><td>Tanpa Keterangan</td><td align="center"><span id="prevRpAlpa">0</span> hari</td></tr>
+              </table>
+            </div>
+
+            <div style="border: 1px solid black; padding: 5px; margin-bottom: 10px; font-size: 9pt;">
+              <strong>Catatan Wali Kelas:</strong><br><p id="prevRpCatatan" style="font-style: italic; margin-top: 3px; min-height: 15px;"></p>
+            </div>
+
+            <!-- Teks Kenaikan Kelas -->
+            <div id="prevKenaikanContainer" style="display: block; font-weight: bold; margin-bottom: 30px; font-size: 9pt;">
+              Keterangan Kenaikan Kelas: <span id="prevRpKenaikan"></span>
+            </div>
+
+            <!-- Area Tanda Tangan Baru -->
+            <div style="font-size: 9pt;">
+              <!-- Baris Atas: Orang Tua (Kiri) & Wali Kelas (Kanan) -->
+              <div style="display: flex; justify-content: space-between; text-align: center;">
+                <div style="width: 200px;">
+                  <p>Mengetahui</p>
+                  <p>Orang Tua/Wali,</p>
+                  <br><br><br>
+                  <p>___________________</p>
+                </div>
+                
+                <div style="width: 200px;">
+                  <p>Karawang, <span id="prevRpTanggal"></span></p>
+                  <p>Wali Kelas,</p>
+                  <br><br><br>
+                  <p style="font-weight: bold; text-decoration: underline;" id="prevRpWali">___________________</p>
+                </div>
+              </div>
+
+              <!-- Baris Bawah: Kepala Sekolah (Tengah) -->
+              <div style="text-align: center; margin-top: 10px;">
+                <p>Mengetahui</p>
+                <p>Kepala Sekolah,</p>
+                <br><br><br>
+                <p style="font-weight: bold; text-decoration: underline;" id="prevRpKepsek">___________________</p>
+                <p>NIP. -</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODUL NILAI LHB (SESUAI FORMAT FILE DOCX)  -->
+    <!-- ========================================== -->
+    <div id="page-lhb" class="page-content hidden h-full">
+      <div class="flex h-full">
+        <!-- Form Kiri -->
+        <div class="w-1/2 bg-white p-6 rounded shadow overflow-y-auto no-print text-sm">
+          <h2 class="text-xl font-bold mb-4">Input Nilai LHB (Tengah Semester)</h2>
+          <div class="space-y-3">
+            <h3 class="font-bold border-b pb-1">Identitas Siswa</h3>
+            <div><label class="font-semibold">Nama Peserta Didik</label><input type="text" id="lhbNama" class="w-full border p-2 rounded" oninput="updateLhb()"></div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="font-semibold">Kelas</label><input type="text" id="lhbKelas" class="w-full border p-2 rounded" oninput="updateLhb()"></div>
+              <div><label class="font-semibold">Wali Kelas</label><input type="text" id="lhbWali" class="w-full border p-2 rounded" oninput="updateLhb()"></div>
+            </div>
+            
+            <h3 class="font-bold border-b pb-1 mt-4">Hasil Belajar (Nilai & Keterangan)</h3>
+            <div class="grid grid-cols-12 gap-1 mb-1 font-semibold text-xs text-center"><div class="col-span-4">Mapel</div><div class="col-span-3">Nilai</div><div class="col-span-5">Keterangan</div></div>
+            <!-- Looping Mapel -->
+            <div class="grid grid-cols-12 gap-1 items-center"><div class="col-span-4 text-xs">PAI</div><div class="col-span-3"><input type="number" id="lhbPai" class="w-full border p-1 rounded" oninput="updateLhb()"></div><div class="col-span-5"><input type="text" id="lhbKetPai" class="w-full border p-1 rounded" oninput="updateLhb()"></div></div>
+            <div class="grid grid-cols-12 gap-1 items-center"><div class="col-span-4 text-xs">Pend. Pancasila</div><div class="col-span-3"><input type="number" id="lhbPp" class="w-full border p-1 rounded" oninput="updateLhb()"></div><div class="col-span-5"><input type="text" id="lhbKetPp" class="w-full border p-1 rounded" oninput="updateLhb()"></div></div>
+            <div class="grid grid-cols-12 gap-1 items-center"><div class="col-span-4 text-xs">B. Indonesia</div><div class="col-span-3"><input type="number" id="lhbBindo" class="w-full border p-1 rounded" oninput="updateLhb()"></div><div class="col-span-5"><input type="text" id="lhbKetBindo" class="w-full border p-1 rounded" oninput="updateLhb()"></div></div>
+            <div class="grid grid-cols-12 gap-1 items-center"><div class="col-span-4 text-xs">Matematika</div><div class="col-span-3"><input type="number" id="lhbMtk" class="w-full border p-1 rounded" oninput="updateLhb()"></div><div class="col-span-5"><input type="text" id="lhbKetMtk" class="w-full border p-1 rounded" oninput="updateLhb()"></div></div>
+            <div class="grid grid-cols-12 gap-1 items-center"><div class="col-span-4 text-xs">IPAS</div><div class="col-span-3"><input type="number" id="lhbIpas" class="w-full border p-1 rounded" oninput="updateLhb()"></div><div class="col-span-5"><input type="text" id="lhbKetIpas" class="w-full border p-1 rounded" oninput="updateLhb()"></div></div>
+            <div class="grid grid-cols-12 gap-1 items-center"><div class="col-span-4 text-xs">B. Inggris</div><div class="col-span-3"><input type="number" id="lhbBing" class="w-full border p-1 rounded" oninput="updateLhb()"></div><div class="col-span-5"><input type="text" id="lhbKetBing" class="w-full border p-1 rounded" oninput="updateLhb()"></div></div>
+            <div class="grid grid-cols-12 gap-1 items-center"><div class="col-span-4 text-xs">PJOK</div><div class="col-span-3"><input type="number" id="lhbPjok" class="w-full border p-1 rounded" oninput="updateLhb()"></div><div class="col-span-5"><input type="text" id="lhbKetPjok" class="w-full border p-1 rounded" oninput="updateLhb()"></div></div>
+            <div class="grid grid-cols-12 gap-1 items-center"><div class="col-span-4 text-xs">Seni Budaya</div><div class="col-span-3"><input type="number" id="lhbSeni" class="w-full border p-1 rounded" oninput="updateLhb()"></div><div class="col-span-5"><input type="text" id="lhbKetSeni" class="w-full border p-1 rounded" oninput="updateLhb()"></div></div>
+            <div class="grid grid-cols-12 gap-1 items-center"><div class="col-span-4 text-xs">B. Sunda</div><div class="col-span-3"><input type="number" id="lhbSunda" class="w-full border p-1 rounded" oninput="updateLhb()"></div><div class="col-span-5"><input type="text" id="lhbKetSunda" class="w-full border p-1 rounded" oninput="updateLhb()"></div></div>
+
+            <h3 class="font-bold border-b pb-1 mt-4">Catatan Perkembangan & Tanggal</h3>
+            <div><label class="font-semibold text-xs">Kelebihan/Kemajuan</label><textarea id="lhbKelebihan" class="w-full border p-1 rounded h-16" oninput="updateLhb()"></textarea></div>
+            <div><label class="font-semibold text-xs">Perlu Ditingkatkan</label><textarea id="lhbPeningkatan" class="w-full border p-1 rounded h-16" oninput="updateLhb()"></textarea></div>
+            <div><label class="font-semibold text-xs">Tanggal Cetak</label><input type="text" id="lhbTanggal" value="07 Oktober 2026" class="w-full border p-2 rounded" oninput="updateLhb()"></div>
+            
+            <div class="flex gap-2 mt-4 pt-4 border-t">
+              <button onclick="simpanLhb()" class="w-1/2 bg-green-600 text-white p-2 rounded hover:bg-green-700"><i class="fas fa-save"></i> Simpan Data</button>
+              <button onclick="window.print()" class="w-1/2 bg-red-600 text-white p-2 rounded hover:bg-red-700"><i class="fas fa-file-pdf"></i> Cetak A4 / PDF</button>
+            </div>
+
+            <div class="flex gap-2 pt-4 border-t pb-8 flex-wrap">
+              <button onclick="window.print()" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 mb-2"><i class="fas fa-print"></i> Cetak A4 / PDF via Browser</button>
+              
+              <!-- TOMBOL BARU UNTUK GOOGLE DRIVE -->
+              <button onclick="prosesSimpanKeDrive('preview-rapor-id', 'Rapor_Siswa')" class="w-full bg-green-700 text-white p-2 rounded hover:bg-green-800">
+                <i class="fab fa-google-drive"></i> Simpan PDF Langsung ke Drive
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Preview Kanan (Kertas A4 Sesuai DOCX) -->
+        <div class="w-1/2 preview-area">
+          <div class="a4-paper" style="font-family: 'Times New Roman', Times, serif; font-size: 12pt; padding: 25mm;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <h1 style="font-size: 14pt; font-weight: bold; margin: 0;">LAPORAN HASIL BELAJAR SISWA</h1>
+              <h2 style="font-size: 14pt; font-weight: bold; margin: 0;">TENGAH SEMESTER</h2>
+            </div>
+            
+            <table style="width: 100%; margin-bottom: 20px; line-height: 1.5;">
+              <tr><td width="20%">Satuan Pendidikan</td><td width="2%">:</td><td width="40%">SDIT Annihayah</td><td width="15%">Tahun Pelajaran</td><td width="2%">:</td><td>2026/2027</td></tr>
+              <tr><td>Semester</td><td>:</td><td>GANJIL</td><td>Kelas</td><td>:</td><td id="prevLhbKelasTitle" style="font-weight:bold; border-bottom:1px solid black; display:inline-block; min-width:50px;"></td></tr>
+            </table>
+
+            <h3 style="font-size: 12pt; font-weight: bold; margin-bottom: 5px;">A. IDENTITAS PESERTA DIDIK</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;" border="1" cellpadding="6">
+              <tr style="background-color: #f3f4f6; font-weight: bold; text-align:center;"><td width="30%">Identitas</td><td>Keterangan</td></tr>
+              <tr><td>Nama Peserta Didik</td><td id="prevLhbNama" style="font-weight:bold;"></td></tr>
+              <tr><td>Kelas</td><td id="prevLhbKelas"></td></tr>
+              <tr><td>Wali Kelas</td><td id="prevLhbWali"></td></tr>
+            </table>
+
+            <h3 style="font-size: 12pt; font-weight: bold; margin-bottom: 5px;">B. HASIL BELAJAR</h3>
+            <table style="width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 30px;" border="1" cellpadding="6">
+              <tr style="background-color: #f3f4f6; font-weight: bold;">
+                <td width="5%">No.</td><td width="35%">Mata Pelajaran</td><td width="15%">Nilai</td><td width="45%">Keterangan</td>
+              </tr>
+              <tr><td>1</td><td style="text-align: left;">Pendidikan Agama Islam</td><td id="prevLhbPai"></td><td id="prevLhbKetPai"></td></tr>
+              <tr><td>2</td><td style="text-align: left;">Pendidikan Pancasila</td><td id="prevLhbPp"></td><td id="prevLhbKetPp"></td></tr>
+              <tr><td>3</td><td style="text-align: left;">Bahasa Indonesia</td><td id="prevLhbBindo"></td><td id="prevLhbKetBindo"></td></tr>
+              <tr><td>4</td><td style="text-align: left;">Matematika</td><td id="prevLhbMtk"></td><td id="prevLhbKetMtk"></td></tr>
+              <tr><td>5</td><td style="text-align: left;">IPAS</td><td id="prevLhbIpas"></td><td id="prevLhbKetIpas"></td></tr>
+              <tr><td>6</td><td style="text-align: left;">Bahasa Inggris</td><td id="prevLhbBing"></td><td id="prevLhbKetBing"></td></tr>
+              <tr><td>7</td><td style="text-align: left;">PJOK</td><td id="prevLhbPjok"></td><td id="prevLhbKetPjok"></td></tr>
+              <tr><td>8</td><td style="text-align: left;">Seni Budaya</td><td id="prevLhbSeni"></td><td id="prevLhbKetSeni"></td></tr>
+              <tr><td>9</td><td style="text-align: left;">Bahasa Sunda</td><td id="prevLhbSunda"></td><td id="prevLhbKetSunda"></td></tr>
+            </table>
+
+            <h3 style="font-size: 12pt; font-weight: bold; margin-bottom: 5px;">C. CATATAN PERKEMBANGAN SISWA</h3>
+            <div style="line-height: 1.8;">
+              <p>1. Kelebihan/kemajuan yang terlihat:</p>
+              <p id="prevLhbKelebihan" style="min-height: 25px; border-bottom: 1px dotted black; font-style: italic; padding-left:15px;"></p>
+              <p>2. Hal yang masih perlu ditingkatkan:</p>
+              <p id="prevLhbPeningkatan" style="min-height: 25px; border-bottom: 1px dotted black; font-style: italic; padding-left:15px;"></p>
+            </div>
+
+            <div style="margin-top: 40px; text-align: right; margin-right: 20px;">
+              <p>Karawang, <span id="prevLhbTanggal">07 Oktober 2026</span></p>
+              <p>Wali Kelas,</p>
+              <br><br><br>
+              <p style="font-weight: bold; text-decoration: underline;" id="prevLhbTtdWali">________________________</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+   <!-- ========================================== -->
+    <!-- MODUL TRANSKRIP NILAI & IJAZAH             -->
+    <!-- ========================================== -->
+    <div id="page-transkrip" class="page-content hidden flex flex-col h-full p-4 box-border overflow-y-auto">
+      
+      <!-- HEADER UTAMA HALAMAN (100% UTUH DI ATAS) -->
+      <div class="flex justify-between items-center mb-4 bg-white p-4 rounded shadow w-full">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <i class="fas fa-file-alt text-blue-600"></i> Transkrip Nilai &amp; Ijazah
+          </h2>
+          <p class="text-xs text-gray-500">Pengelolaan transkrip nilai akhir dan penertiban dokumen kelulusan siswa</p>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" onclick="toggleTinjauanTranskrip()" id="btnToggleTranskrip" class="bg-indigo-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-indigo-700 shadow flex items-center gap-2">
+            <i class="fas fa-eye"></i> <span>Buka Tinjauan A4</span>
+          </button>
+          <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-blue-700 shadow flex items-center gap-1">
+            <i class="fas fa-print"></i> <span>Cetak A4 / PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTAINER UTAMA -->
+      <div class="w-full">
+        
+        <!-- 1. FORM INPUT TRANSKRIP (LEBAR UTUH 100% DEFAULT) -->
+        <div id="form-container-transkrip" class="w-full bg-white p-6 rounded shadow space-y-6">
+          
+          <!-- SELEKSI SISWA LULUSAN & ATUR TANGGAL -->
+          <div class="bg-blue-50 p-4 rounded border border-blue-200 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="font-semibold text-xs text-blue-900 block mb-1">Pilih Siswa (Dari Data Lulusan)</label>
+              <select id="trPilihSiswa" class="w-full border-2 border-blue-400 p-2 rounded font-bold text-sm bg-white" onchange="sinkronLulusanKeTranskrip()">
+                <option value="">-- Memuat data lulusan... --</option>
+              </select>
+            </div>
+            <div>
+              <label class="font-semibold text-xs text-blue-900 block mb-1">Tanggal Kelulusan</label>
+              <input type="text" id="trTglLulus" value="15 Juni 2026" class="w-full border p-2 rounded text-sm bg-white" oninput="updateTranskrip()">
+            </div>
+            <div>
+              <label class="font-semibold text-xs text-blue-900 block mb-1">Tanggal Terbit Transkrip</label>
+              <input type="text" id="trTglTerbit" value="16 Juni 2026" class="w-full border p-2 rounded text-sm bg-white" oninput="updateTranskrip()">
+            </div>
+          </div>
+
+          <!-- DATA BIODATA TRANSKRIP -->
+          <div>
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
+              <i class="fas fa-user-graduate text-blue-600"></i> Detail Identitas Kelulusan Siswa
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label class="font-semibold text-gray-700">Nama Lengkap Siswa</label>
+                <input type="text" id="trNama" class="w-full border p-2 rounded text-sm" oninput="updateTranskrip()">
+              </div>
+              <div>
+                <label class="font-semibold text-gray-700">NIS / NISN</label>
+                <input type="text" id="trNisn" class="w-full border p-2 rounded text-sm" oninput="updateTranskrip()">
+              </div>
+              <div>
+                <label class="font-semibold text-gray-700">Tempat, Tanggal Lahir</label>
+                <input type="text" id="trTtl" class="w-full border p-2 rounded text-sm" oninput="updateTranskrip()">
+              </div>
+              <div>
+                <label class="font-semibold text-gray-700">Nomor Ijazah / Dokumen</label>
+                <input type="text" id="trNoIjazah" placeholder="Nomor: 400.3.11/012/SD-VI/2026" class="w-full border p-2 rounded text-sm" oninput="updateTranskrip()">
+              </div>
+              <div>
+                <label class="font-semibold text-gray-700">Tahun Pelajaran Kelulusan</label>
+                <input type="text" id="trTahun" value="2025/2026" class="w-full border p-2 rounded text-sm" oninput="updateTranskrip()">
+              </div>
+              <div>
+                <label class="font-semibold text-gray-700">Kepala Sekolah Penandatangan</label>
+                <input type="text" id="trKepsek" value="KARTIKA DEWI, S.Pd" class="w-full border p-2 rounded text-sm" oninput="updateTranskrip()">
+              </div>
+            </div>
+          </div>
+
+          <!-- TOMBOL AKSI -->
+          <div class="flex gap-2 pt-3 border-t">
+            <button onclick="simpanUniversal('Data_Transkrip', 'tr')" class="bg-green-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-green-700 shadow flex items-center gap-1">
+              <i class="fas fa-save"></i> <span>Simpan Transkrip Nilai</span>
+            </button>
+            <button onclick="toggleTinjauanTranskrip()" class="bg-indigo-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-indigo-700 shadow flex items-center gap-1">
+              <i class="fas fa-eye"></i> <span>Pratinjau Kertas A4</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- 2. AREA TINJAUAN KERTAS A4 (SEMBUNYI TOTAL SAAT TIDAK DIGUNAKAN) -->
+        <div id="preview-area-transkrip" class="w-full bg-gray-300 p-6 rounded shadow hidden flex-col items-center justify-center overflow-x-auto">
+          
+          <div class="mb-4 no-print flex gap-3">
+             <button onclick="toggleTinjauanTranskrip()" class="bg-gray-700 text-white px-4 py-2 rounded text-xs font-bold hover:bg-gray-800 shadow flex items-center gap-1">
+               <i class="fas fa-arrow-left"></i> <span>Kembali ke Form Input</span>
+             </button>
+             <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-blue-700 shadow flex items-center gap-1">
+               <i class="fas fa-print"></i> <span>Cetak Kertas A4 Sekarang</span>
+             </button>
+          </div>
+
+          <!-- LEMBAR A4 TRANSKRIP -->
+          <div id="lembar-transkrip-a4" class="bg-white p-8 shadow-2xl rounded box-border" style="width: 210mm; min-height: 297mm; font-family: Arial, sans-serif; font-size: 10pt; color: #000;">
+            
+            <!-- HEADER KOP SURAT -->
+            <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 15px;">
+              <h3 style="margin: 0; font-size: 11pt; font-weight: bold;">DINAS PENDIDIKAN, PEMUDA DAN OLAHRAGA KABUPATEN KARAWANG</h3>
+              <h3 style="margin: 0; font-size: 11pt; font-weight: bold;">KORWILCAMBIDIK KECAMATAN RAWAMERTA</h3>
+              <h2 style="margin: 2px 0; font-size: 14pt; font-weight: bold;">SDIT ANNIHAYAH</h2>
+              <p style="margin: 0; font-size: 9pt;">Alamat : Dusun Krajan Satu Desa Sukamerta Kec. Rawamerta Kab. Karawang</p>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 15px;">
+              <h3 style="margin: 0; font-size: 12pt; font-weight: bold; text-decoration: underline;">TRANSKRIP NILAI</h3>
+              <p style="margin: 2px 0 0 0; font-size: 9pt;" id="prevTrNoIjazah">Nomor : 400.3.11/012/SD-VI/2026</p>
+            </div>
+
+            <!-- DETAIL SISWA -->
+            <table style="width: 100%; font-size: 9.5pt; margin-bottom: 15px; border-collapse: collapse;">
+              <tr><td width="28%">Satuan Pendidikan</td><td width="2%">:</td><td width="70%">SDIT ANNIHAYAH</td></tr>
+              <tr><td>NPSN</td><td>:</td><td>69993044</td></tr>
+              <tr><td>Nama Lengkap</td><td>:</td><td id="prevTrNama" style="font-weight: bold;">...</td></tr>
+              <tr><td>Tempat, Tanggal Lahir</td><td>:</td><td id="prevTrTtl">...</td></tr>
+              <tr><td>NIS / NISN</td><td>:</td><td id="prevTrNisn">...</td></tr>
+              <tr><td>Tanggal Kelulusan</td><td>:</td><td id="prevTrTglLulus">15 Juni 2026</td></tr>
+            </table>
+
+            <!-- TABEL NILAI -->
+            <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 9.5pt; margin-bottom: 20px;">
+              <thead>
+                <tr style="background-color: #f3f4f6; text-align: center; font-weight: bold;">
+                  <th width="10%">No.</th>
+                  <th width="70%">Mata Pelajaran</th>
+                  <th width="20%">Nilai</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td align="center">1.</td><td>Pendidikan Agama dan Budi Pekerti</td><td align="center">92</td></tr>
+                <tr><td align="center">2.</td><td>Pendidikan Pancasila</td><td align="center">90</td></tr>
+                <tr><td align="center">3.</td><td>Bahasa Indonesia</td><td align="center">91</td></tr>
+                <tr><td align="center">4.</td><td>Matematika</td><td align="center">88</td></tr>
+                <tr><td align="center">5.</td><td>Ilmu Pengetahuan Alam dan Sosial</td><td align="center">90</td></tr>
+                <tr><td align="center">6.</td><td>Pendidikan Jasmani, Olahraga dan Kesehatan</td><td align="center">92</td></tr>
+                <tr><td align="center">7.</td><td>Seni dan Budaya</td><td align="center">93</td></tr>
+                <tr><td align="center">8.</td><td>Bahasa Inggris</td><td align="center">94</td></tr>
+                <tr><td align="center">9.</td><td>Muatan Lokal : Bahasa Sunda</td><td align="center">90</td></tr>
+              </tbody>
+            </table>
+
+            <!-- TANDA TANGAN KEPSEK -->
+            <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
+              <div style="text-align: center; width: 220px; position: relative;">
+                <p style="margin:0;">Karawang, <span id="prevTrTglTerbit">16 Juni 2026</span></p>
+                <p style="margin:0 0 10px 0;">Kepala Sekolah,</p>
+                
+                <div style="position: relative; height: 75px; display: flex; align-items: center; justify-content: center;">
+                  <img class="img-stempel-ttd" 
+                       id="imgTtdKepsekTr" 
+                       src="https://lh3.googleusercontent.com/d/ID_FILE_DRIVE_ANDA" 
+                       alt="Stempel &amp; TTD Kepsek" 
+                       style="max-height: 90px; width: auto; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 10; mix-blend-mode: screen; filter: contrast(140%); display: block;"
+                       onerror="this.style.display='none';">
+                </div>
+
+                <p style="text-decoration: underline; font-weight: bold; margin: 0; position: relative; z-index: 20;" id="prevTrKepsek">KARTIKA DEWI, S.Pd</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  
+<!-- ========================================== -->
+    <!-- 9. DATA MUTASI (MASUK & KELUAR)            -->
+    <!-- ========================================== -->
+    <div id="page-mutasi" class="page-content hidden h-full p-6">
+      <div class="w-full flex justify-between items-center bg-white p-3 rounded shadow mb-4 no-print">
+        <div class="flex gap-2">
+          <button id="btnTabMutasiMasuk" onclick="switchMutasi('masuk')" class="bg-blue-600 text-white px-4 py-2 rounded font-bold">⬇ Mutasi Masuk</button>
+          <button id="btnTabMutasiKeluar" onclick="switchMutasi('keluar')" class="bg-gray-300 text-gray-800 px-4 py-2 rounded font-bold">⬆ Mutasi Keluar</button>
+        </div>
+      </div>
+
+      <div class="flex gap-6 h-[75vh]">
+        <!-- KIRI: Form Input Mutasi -->
+        <div class="w-1/3 bg-white p-6 rounded shadow overflow-y-auto text-sm">
+          <h2 class="text-xl font-bold mb-4" id="formMutasiTitle">Input Mutasi Masuk</h2>
+          <input type="hidden" id="mutBaris">
+          <input type="hidden" id="mutJenis" value="masuk">
+          
+          <div class="space-y-3">
+            <!-- KONTEN BARU: Dropdown khusus Mutasi Keluar (Terintegrasi) -->
+            <div id="mutContainerKeluar" class="hidden mb-2 p-3 bg-blue-50 border border-blue-200 rounded">
+              <label class="font-semibold text-blue-800">Pilih Siswa Aktif (Untuk Mutasi Keluar)</label>
+              <select id="mutPilihSiswa" class="w-full border p-2 rounded font-bold mt-1 focus:ring-2 focus:ring-blue-500" onchange="autoFillMutasiKeluar()">
+                <option value="">-- Pilih Siswa --</option>
+              </select>
+              <p class="text-xs text-gray-500 mt-1">*Biodata akan otomatis terisi setelah siswa dipilih.</p>
+            </div>
+
+            <div><label class="font-semibold">Nama Lengkap</label><input type="text" id="mutNama" class="w-full border p-1 rounded"></div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="font-semibold">NISN</label><input type="text" id="mutNisn" class="w-full border p-1 rounded"></div>
+              <div><label class="font-semibold">Kelas</label><input type="text" id="mutKelas" class="w-full border p-1 rounded"></div>
+            </div>
+            <div><label class="font-semibold" id="labelSekolah">Asal Sekolah</label><input type="text" id="mutSekolah" class="w-full border p-1 rounded"></div>
+            <div><label class="font-semibold">Alamat Sekolah</label><textarea id="mutAlamatSekolah" class="w-full border p-1 rounded h-12"></textarea></div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="font-semibold">Nama Ayah</label><input type="text" id="mutAyah" class="w-full border p-1 rounded"></div>
+              <div><label class="font-semibold">Nama Ibu</label><input type="text" id="mutIbu" class="w-full border p-1 rounded"></div>
+            </div>
+            <div><label class="font-semibold">Alamat Rumah</label><textarea id="mutAlamat" class="w-full border p-1 rounded h-16"></textarea></div>
+          </div>
+
+          <div class="flex gap-2 mt-4 pb-4 border-t pt-4">
+            <button onclick="simpanMutasi()" class="w-1/2 bg-green-600 text-white p-2 rounded hover:bg-green-700"><i class="fas fa-save"></i> Simpan Data</button>
+            <button onclick="resetFormMutasi()" class="w-1/2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600"><i class="fas fa-undo"></i> Batal / Reset</button>
+          </div>
+        </div>
+
+        <!-- KANAN: Tabel Data Mutasi -->
+        <div class="w-2/3 bg-white p-6 rounded shadow overflow-y-auto">
+          <h3 class="font-bold mb-2 text-lg" id="tabelMutasiTitle">Daftar Mutasi Masuk</h3>
+          <button onclick="muatDataMutasi()" class="mb-4 bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm hover:bg-blue-200"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+          
+          <table class="w-full text-left border-collapse text-sm" id="tabel-mutasi">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="p-2 border">Nama Siswa</th>
+                <th class="p-2 border">Kelas</th>
+                <th class="p-2 border" id="thSekolah">Asal Sekolah</th>
+                <th class="p-2 border">Aksi</th>
+              </tr>
+            </thead>
+            <tbody><tr><td colspan="4" class="p-4 text-center">Memuat data...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+<!-- ========================================== -->
+    <!-- 10. DATA INDUK (BULANAN & LULUSAN TAHUNAN) -->
+    <!-- ========================================== -->
+    <div id="page-induk" class="page-content hidden h-full p-6 overflow-y-auto">
+      <h2 class="text-2xl font-bold mb-6 text-gray-800">Master Data Induk Siswa</h2>
+      
+      <div class="flex flex-col md:flex-row gap-6">
+        
+        <!-- KOLOM 1: DATA INDUK BULANAN (PER ROMBEL) -->
+        <div class="w-full md:w-1/2 bg-white p-5 rounded shadow">
+          <h3 class="text-lg font-bold mb-4 border-b pb-2 text-blue-700" id="formIndukBTitle">Input Data Siswa Bulanan</h3>
+          <input type="hidden" id="ibBaris">
+          
+          <div class="grid grid-cols-2 gap-3 mb-4 text-sm">
+            <div>
+              <label class="font-semibold">Bulan & Tahun</label>
+              <input type="month" id="ibBulan" class="w-full border p-2 rounded">
+            </div>
+            <div>
+              <label class="font-semibold">Kelas / Rombel</label>
+              <input type="text" id="ibKelas" placeholder="Cth: Kelas 1A" class="w-full border p-2 rounded">
+            </div>
+            <div>
+              <label class="font-semibold">Jml Laki-laki</label>
+              <input type="number" id="ibL" placeholder="0" class="w-full border p-2 rounded">
+            </div>
+            <div>
+              <label class="font-semibold">Jml Perempuan</label>
+              <input type="number" id="ibP" placeholder="0" class="w-full border p-2 rounded">
+            </div>
+          </div>
+          
+          <div class="flex gap-2 mb-6">
+            <button onclick="simpanIndukBulanan()" class="w-1/2 bg-green-600 text-white p-2 rounded hover:bg-green-700 text-sm font-bold"><i class="fas fa-save"></i> Simpan Data</button>
+            <button onclick="resetIndukBulanan()" class="w-1/2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600 text-sm font-bold"><i class="fas fa-undo"></i> Batal</button>
+          </div>
+
+          <div class="flex justify-between items-center mb-2">
+            <h4 class="font-bold">Rekap Bulanan</h4>
+            <button onclick="muatDataIndukBulanan()" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs hover:bg-blue-200"><i class="fas fa-sync-alt"></i> Refresh</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs" id="tabel-induk-bulanan">
+              <thead>
+                <tr class="bg-gray-200"><th class="p-2 border">Bulan</th><th class="p-2 border">Kelas</th><th class="p-2 border">L</th><th class="p-2 border">P</th><th class="p-2 border">Total</th><th class="p-2 border">Aksi</th></tr>
+              </thead>
+              <tbody><tr><td colspan="6" class="p-4 text-center">Memuat...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- KOLOM 2: DATA LULUSAN TAHUNAN -->
+        <div class="w-full md:w-1/2 bg-white p-5 rounded shadow">
+          <h3 class="text-lg font-bold mb-4 border-b pb-2 text-green-700" id="formIndukLTitle">Input Data Lulusan Tahunan</h3>
+          <input type="hidden" id="ilBaris">
+          
+          <div class="grid grid-cols-3 gap-3 mb-4 text-sm">
+            <div>
+              <label class="font-semibold">Tahun Lulus</label>
+              <input type="number" id="ilTahun" placeholder="2026" class="w-full border p-2 rounded">
+            </div>
+            <div>
+              <label class="font-semibold">Lulusan (L)</label>
+              <input type="number" id="ilL" placeholder="0" class="w-full border p-2 rounded">
+            </div>
+            <div>
+              <label class="font-semibold">Lulusan (P)</label>
+              <input type="number" id="ilP" placeholder="0" class="w-full border p-2 rounded">
+            </div>
+          </div>
+          
+          <div class="flex gap-2 mb-6">
+            <button onclick="simpanIndukLulusan()" class="w-1/2 bg-green-600 text-white p-2 rounded hover:bg-green-700 text-sm font-bold"><i class="fas fa-save"></i> Simpan Data</button>
+            <button onclick="resetIndukLulusan()" class="w-1/2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600 text-sm font-bold"><i class="fas fa-undo"></i> Batal</button>
+          </div>
+
+          <div class="flex justify-between items-center mb-2">
+            <h4 class="font-bold">Rekap Kelulusan</h4>
+            <button onclick="muatDataIndukLulusan()" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs hover:bg-blue-200"><i class="fas fa-sync-alt"></i> Refresh</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs" id="tabel-induk-lulusan">
+              <thead>
+                <tr class="bg-gray-200"><th class="p-2 border">Tahun</th><th class="p-2 border">L</th><th class="p-2 border">P</th><th class="p-2 border">Total Lulus</th><th class="p-2 border">Aksi</th></tr>
+              </thead>
+              <tbody><tr><td colspan="5" class="p-4 text-center">Memuat...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      <!-- KONTEN BARU: MASTER SISWA AKTIF & LULUSAN -->
+        <div class="w-full mt-6 bg-white p-5 rounded shadow">
+          <h3 class="text-lg font-bold mb-4 border-b pb-2 text-indigo-700">Master Daftar Siswa (Terintegrasi)</h3>
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="w-full md:w-1/2">
+              <h4 class="font-bold mb-2 text-blue-600">Daftar Siswa Aktif</h4>
+              <div class="overflow-x-auto h-48 border rounded">
+                <table class="w-full text-left text-xs" id="tabel-master-aktif">
+                  <thead class="bg-gray-100 sticky top-0"><tr><th class="p-2 border">Nama</th><th class="p-2 border">NISN</th><th class="p-2 border">Kelas</th></tr></thead>
+                  <tbody><tr><td colspan="3" class="text-center p-2 text-gray-500">Memuat data...</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="w-full md:w-1/2">
+              <h4 class="font-bold mb-2 text-green-600">Daftar Siswa Lulusan</h4>
+              <div class="overflow-x-auto h-48 border rounded">
+                <table class="w-full text-left text-xs" id="tabel-master-lulusan">
+                  <thead class="bg-gray-100 sticky top-0"><tr><th class="p-2 border">Nama Lulusan</th><th class="p-2 border">NISN</th><th class="p-2 border">Tahun Lulus</th></tr></thead>
+                  <tbody><tr><td colspan="3" class="text-center p-2 text-gray-500">Memuat data...</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+    
+    <!-- ========================================== -->
+    <!-- 7. DATA SISWA (BIODATA LENGKAP & LIVE PREVIEW A4) -->
+    <!-- ========================================== -->
+    <div id="page-data-siswa" class="page-content hidden h-full">
+      <div class="flex h-full">
+        <!-- Kiri: Form Input & Tabel -->
+        <div class="w-1/2 bg-white p-6 overflow-y-auto border-r shadow-lg no-print text-sm">
+          <h2 class="text-xl font-bold mb-4" id="formSiswaTitle">Tambah Biodata Siswa</h2>
+          <input type="hidden" id="dsBaris">
+          
+          <div class="grid grid-cols-2 gap-2 mb-4">
+            <div class="col-span-2"><label class="font-semibold">Nama Lengkap</label><input type="text" id="dsNama" class="w-full border p-1 rounded" oninput="updatePreviewSiswa()"></div>
+            
+            <!-- KONTEN BARU: Pilihan Status Siswa -->
+            <div class="col-span-2 bg-blue-50 p-2 rounded border border-blue-200">
+              <label class="font-semibold text-blue-800">Status Siswa Saat Ini</label>
+              <select id="dsStatus" class="w-full border-2 border-blue-400 p-1 rounded font-bold text-blue-700" onchange="updatePreviewSiswa()">
+                <option value="Aktif">Siswa Aktif</option>
+                <option value="Lulusan">Siswa Lulusan</option>
+              </select>
+            </div>
+
+            <div><label class="font-semibold">NIS</label><input type="text" id="dsNis" class="w-full border p-1 rounded" oninput="updatePreviewSiswa()"></div>
+            <div><label class="font-semibold">NISN</label><input type="text" id="dsNisn" class="w-full border p-1 rounded" oninput="updatePreviewSiswa()"></div>
+            <div><label class="font-semibold">Tempat, Tgl Lahir</label><input type="text" id="dsTtl" class="w-full border p-1 rounded" oninput="updatePreviewSiswa()"></div>
+            <div><label class="font-semibold">Kelas</label><input type="text" id="dsKelas" class="w-full border p-1 rounded" oninput="updatePreviewSiswa()"></div>
+            <div><label class="font-semibold">Tanggal Masuk</label><input type="date" id="dsTglMasuk" class="w-full border p-1 rounded" oninput="updatePreviewSiswa()"></div>
+            <div><label class="font-semibold">Tahun Ajaran</label><input type="text" id="dsTahun" class="w-full border p-1 rounded" oninput="updatePreviewSiswa()"></div>
+            <div><label class="font-semibold">NIK</label><input type="number" id="dsNik" class="w-full border p-1 rounded" oninput="updatePreviewSiswa()"></div>
+            <div><label class="font-semibold">No. KK</label><input type="number" id="dsKk" class="w-full border p-1 rounded" oninput="updatePreviewSiswa()"></div>
+            <div><label class="font-semibold">Nama Ayah</label><input type="text" id="dsAyah" class="w-full border p-1 rounded" oninput="updatePreviewSiswa()"></div>
+            <div><label class="font-semibold">Nama Ibu</label><input type="text" id="dsIbu" class="w-full border p-1 rounded" oninput="updatePreviewSiswa()"></div>
+            <div class="col-span-2"><label class="font-semibold">Alamat Lengkap</label><textarea id="dsAlamat" class="w-full border p-1 rounded h-16" oninput="updatePreviewSiswa()"></textarea></div>
+          </div>
+          
+          <div class="flex gap-2 mb-6 border-b pb-4">
+            <button onclick="simpanSiswa()" class="w-1/3 bg-green-600 text-white p-2 rounded hover:bg-green-700"><i class="fas fa-save"></i> Simpan</button>
+            <button onclick="resetFormSiswa()" class="w-1/3 bg-gray-500 text-white p-2 rounded hover:bg-gray-600"><i class="fas fa-undo"></i> Batal</button>
+            <button onclick="window.print()" class="w-1/3 bg-blue-600 text-white p-2 rounded hover:bg-blue-700"><i class="fas fa-print"></i> Cetak A4</button>
+          </div>
+
+          <div class="flex justify-between items-center mb-2 mt-4">
+             <h3 class="font-bold text-blue-700">Daftar Siswa Aktif</h3>
+             <button onclick="muatDataSiswa(); muatDataLulusan();" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs hover:bg-blue-200"><i class="fas fa-sync-alt"></i> Refresh</button>
+          </div>
+          <div class="overflow-x-auto max-h-48 mb-4 border rounded">
+            <table class="w-full text-left border-collapse text-xs" id="tabel-siswa">
+              <thead class="bg-gray-200 sticky top-0">
+                <tr><th class="p-2 border">Nama</th><th class="p-2 border">NISN</th><th class="p-2 border">Kelas</th><th class="p-2 border">Aksi</th></tr>
+              </thead>
+              <tbody><tr><td colspan="4" class="p-4 text-center">Memuat data...</td></tr></tbody>
+            </table>
+          </div>
+
+          <h3 class="font-bold mb-2 text-green-700 mt-4 border-t pt-4">Daftar Siswa Lulusan (Arsip)</h3>
+          <div class="overflow-x-auto max-h-48 border rounded">
+            <table class="w-full text-left border-collapse text-xs" id="tabel-siswa-lulusan-bio">
+              <thead class="bg-gray-200 sticky top-0">
+                <tr><th class="p-2 border">Nama Lulusan</th><th class="p-2 border">NISN</th><th class="p-2 border">Tahun Lulus</th><th class="p-2 border">Aksi</th></tr>
+              </thead>
+              <tbody><tr><td colspan="4" class="p-4 text-center text-gray-500">Memuat data...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Kanan: A4 Preview Cetak -->
+        <div class="w-1/2 preview-area">
+          <div class="a4-paper" style="font-family: 'Times New Roman', Times, serif; font-size: 12pt; padding: 20mm; line-height: 1.6;">
+            <h2 style="text-align: center; font-size: 16pt; font-weight: bold; text-decoration: underline; margin-bottom: 25px;">BIODATA PESERTA DIDIK</h2>
+            
+            <table style="width: 100%; margin-top: 20px;">
+              <tr><td width="35%">1. Nama Lengkap</td><td width="3%">:</td><td id="prevDsNama" style="font-weight: bold;">-</td></tr>
+              <tr><td>2. NIS / NISN</td><td>:</td><td><span id="prevDsNis">-</span> / <span id="prevDsNisn">-</span></td></tr>
+              <tr><td>3. Tempat, Tanggal Lahir</td><td>:</td><td id="prevDsTtl">-</td></tr>
+              <tr><td>4. Kelas</td><td>:</td><td id="prevDsKelas">-</td></tr>
+              <tr><td>5. Tanggal Masuk</td><td>:</td><td id="prevDsTglMasuk">-</td></tr>
+              <tr><td>6. Tahun Ajaran</td><td>:</td><td id="prevDsTahun">-</td></tr>
+              <tr><td>7. NIK</td><td>:</td><td id="prevDsNik">-</td></tr>
+              <tr><td>8. No. Kartu Keluarga (KK)</td><td>:</td><td id="prevDsKk">-</td></tr>
+              <tr><td>9. Nama Ayah</td><td>:</td><td id="prevDsAyah">-</td></tr>
+              <tr><td>10. Nama Ibu</td><td>:</td><td id="prevDsIbu">-</td></tr>
+              <tr><td valign="top">11. Alamat Lengkap</td><td valign="top">:</td><td id="prevDsAlamat">-</td></tr>
+            </table>
+
+            <div style="margin-top: 60px; text-align: right; padding-right: 40px;">
+              <p>Karawang, ....................................</p>
+              <p>Kepala Sekolah,</p>
+              <br><br><br>
+              <p style="font-weight: bold; text-decoration: underline;">_________________________</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. DATA GURU -->
+    <div id="page-data-guru" class="page-content hidden p-6">
+      <h2 class="text-2xl font-bold mb-4">Master Data Guru</h2>
+      <div class="bg-white p-4 rounded shadow mb-4">
+        <input type="hidden" id="grBaris">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div><label class="text-sm font-semibold">Nama Guru</label><input type="text" id="grNama" class="w-full border p-2 rounded"></div>
+          <div><label class="text-sm font-semibold">Jabatan</label><input type="text" id="grJabatan" class="w-full border p-2 rounded"></div>
+          <div><label class="text-sm font-semibold">Tempat, Tgl Lahir</label><input type="text" id="grTtl" class="w-full border p-2 rounded"></div>
+          <div><label class="text-sm font-semibold">Pendidikan</label><input type="text" id="grPend" class="w-full border p-2 rounded"></div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="simpanGuru()" class="bg-green-600 text-white px-4 py-2 rounded"><i class="fas fa-save"></i> Simpan Guru</button>
+          <button onclick="resetGuru()" class="bg-gray-500 text-white px-4 py-2 rounded"><i class="fas fa-undo"></i> Batal</button>
+        </div>
+      </div>
+      <button onclick="muatGuru()" class="mb-2 bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+      <table class="w-full bg-white rounded shadow text-left border-collapse text-sm" id="tabel-gr">
+        <thead><tr class="bg-gray-200"><th class="p-2 border">Nama</th><th class="p-2 border">Jabatan</th><th class="p-2 border">Pendidikan</th><th class="p-2 border">Aksi</th></tr></thead>
+        <tbody><tr><td class="p-2 border" colspan="4" class="text-center">Klik Refresh Data...</td></tr></tbody>
+      </table>
+    </div>
+    <!-- ========================================== -->
+    <!-- 12. KELOLA AKUN & AKSES (QR & PIN)         -->
+    <!-- ========================================== -->
+    <div id="page-akun" class="page-content hidden h-full p-4 box-border">
+      <div class="flex gap-4 h-full">
+        <!-- KIRI: Form Input Akun -->
+        <div class="w-1/2 bg-white p-6 rounded shadow overflow-y-auto no-print text-sm h-full flex flex-col">
+          <h2 class="text-xl font-bold mb-4 text-blue-800">Manajemen Akses (QR & PIN)</h2>
+          <input type="hidden" id="akBaris">
+          
+          <div class="space-y-3">
+            <div>
+              <label class="font-semibold">Peran</label>
+              <select id="akPeran" class="w-full border p-2 rounded" onchange="updatePreviewAkun()">
+                <option value="Siswa">Siswa</option>
+                <option value="Guru">Guru</option>
+              </select>
+            </div>
+            <div>
+              <label class="font-semibold">Nama Lengkap</label>
+              <input type="text" id="akNama" placeholder="Cth: Adam Faiz" class="w-full border p-2 rounded" oninput="updatePreviewAkun()">
+            </div>
+            <div>
+              <label class="font-semibold text-orange-600">ID Pengguna (NISN untuk Siswa / NIP/No.HP untuk Guru)</label>
+              <input type="text" id="akIdUser" placeholder="Ini akan dijadikan isi dari Kode QR" class="w-full border p-2 rounded border-orange-300" oninput="updatePreviewAkun()">
+            </div>
+            <div>
+              <label class="font-semibold text-red-600">PIN / Password Absensi</label>
+              <input type="text" id="akPin" placeholder="Buat 6 digit PIN (Cth: 123456)" class="w-full border p-2 rounded border-red-300" oninput="updatePreviewAkun()">
+            </div>
+          </div>
+
+          <!-- TOMBOL SIMPAN & CETAK -->
+          <div class="flex flex-col gap-2 pt-4 border-t mt-4">
+            <div class="flex gap-2">
+              <button onclick="simpanAkun()" class="w-1/2 bg-green-600 text-white p-2 rounded hover:bg-green-700 font-bold"><i class="fas fa-save"></i> Simpan Akses</button>
+              <button onclick="resetAkun()" class="w-1/2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600 font-bold"><i class="fas fa-undo"></i> Batal</button>
+            </div>
+            <div class="flex gap-2 mt-2">
+              <button onclick="window.print()" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-bold"><i class="fas fa-print"></i> Cetak Kartu ID</button>
+            </div>
+          </div>
+
+          <!-- TABEL CRUD -->
+          <div class="mt-4 border-t pt-4">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="font-bold text-sm">Daftar Akun Aktif</h3>
+              <button onclick="muatAkun()" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div class="overflow-x-auto h-40">
+              <table class="w-full text-left text-xs border-collapse" id="tabel-akun">
+                <thead class="bg-gray-200"><tr><th class="border p-1">Nama</th><th class="border p-1">ID (QR)</th><th class="border p-1">PIN</th><th class="border p-1">Aksi</th></tr></thead>
+                <tbody><tr><td colspan="4" class="text-center p-2 text-gray-500">Klik Refresh...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- KANAN: Preview Kartu ID & QR Code -->
+        <div class="w-1/2 flex flex-col h-full overflow-hidden">
+          <div class="preview-area rounded shadow flex-1 relative bg-gray-200 flex justify-center items-center">
+            
+            <!-- KARTU ID (ID CARD) -->
+            <div class="a4-paper block" style="width: 86mm; min-height: 140mm; padding: 0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-family: Arial, sans-serif;">
+              
+              <!-- Header Kartu -->
+              <div style="background-color: #166534; color: white; text-align: center; padding: 15px 10px;">
+                <h3 style="margin: 0; font-size: 14pt; font-weight: bold;">SDIT ANNIHAYAH</h3>
+                <p style="margin: 0; font-size: 8pt;">KARTU IDENTITAS <span id="prevAkPeranCaps" style="text-transform: uppercase;">SISWA</span></p>
+              </div>
+
+              <!-- Isi Kartu (QR & Nama) -->
+              <div style="padding: 20px; text-align: center; background-color: white;">
+                
+                <!-- Kotak QR Code -->
+                <div style="border: 2px solid #166534; padding: 10px; display: inline-block; border-radius: 10px; margin-bottom: 15px;">
+                  <img id="prevAkQR" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=KOSONG" alt="QR Code" style="width: 120px; height: 120px;">
+                </div>
+
+                <h2 id="prevAkNama" style="margin: 0 0 5px 0; font-size: 14pt; font-weight: bold; color: #1f2937;">Nama Lengkap</h2>
+                <p style="margin: 0; font-size: 10pt; color: #4b5563;">ID: <span id="prevAkIdUser" style="font-weight: bold;">-</span></p>
+                
+                <div style="margin-top: 15px; background-color: #fef2f2; border: 1px dashed #ef4444; padding: 10px; border-radius: 5px;">
+                  <p style="margin: 0; font-size: 8pt; color: #dc2626;">PIN Kehadiran Anda:</p>
+                  <p id="prevAkPin" style="margin: 0; font-size: 14pt; font-weight: bold; color: #b91c1c; letter-spacing: 2px;">******</p>
+                </div>
+              </div>
+
+              <!-- Footer Kartu -->
+              <div style="background-color: #f3f4f6; text-align: center; padding: 10px; font-size: 7pt; color: #6b7280; border-top: 2px solid #166534;">
+                Gunakan QR Code atau PIN ini pada mesin presensi sekolah.
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <!-- ========================================== -->
+    <!-- 13. PORTOFOLIO NILAI RAPOR (KELAS 1 - 6)   -->
+    <!-- ========================================== -->
+    <div id="page-portofolio" class="page-content hidden h-full p-4 box-border">
+      <div class="flex gap-4 h-full">
+        
+        <!-- KIRI: Form Input & Filter -->
+        <div class="w-1/2 bg-white p-6 rounded shadow overflow-y-auto no-print text-sm h-full flex flex-col">
+          <h2 class="text-xl font-bold mb-4 text-blue-800"><i class="fas fa-book-open"></i> Portofolio & Rekap Nilai</h2>
+          
+          <!-- FILTER PENCARIAN -->
+          <div class="bg-blue-50 p-3 rounded border border-blue-200 mb-4">
+             <h3 class="font-bold text-blue-800 mb-2"><i class="fas fa-filter"></i> Pencarian Portofolio</h3>
+             <div class="grid grid-cols-3 gap-2">
+                <input type="text" id="flPfTahun" placeholder="Tahun Masuk" class="border p-2 rounded text-xs">
+                <input type="text" id="flPfNama" placeholder="Nama Siswa" class="border p-2 rounded text-xs">
+                <input type="text" id="flPfNisn" placeholder="NISN" class="border p-2 rounded text-xs">
+                <button onclick="filterPortofolio()" class="col-span-3 bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition shadow">Cari Data Portofolio</button>
+             </div>
+          </div>
+
+          <!-- FORM DATA SISWA (Terintegrasi Lulusan) -->
+          <input type="hidden" id="pfBaris">
+          <input type="hidden" id="pfNama">
+          <input type="hidden" id="pfNisn">
+          <div class="grid grid-cols-2 gap-2 mb-4">
+             <div class="col-span-2">
+                <label class="font-semibold text-xs">Pilih Siswa (Dari Data Lulusan) <span id="statusPf" class="font-normal text-xs ml-1"></span></label>
+                <select id="pfPilihSiswa" class="w-full border p-2 rounded bg-blue-50 focus:ring-2 focus:ring-blue-500" onchange="sinkronLulusanKePortofolio();">
+                    <option value="">-- Memuat Data Lulusan... --</option>
+                </select>
+             </div>
+          </div>
+
+          <!-- KONTROL INPUT (PILIH KELAS & TAHUN AJARAN) -->
+          <div class="bg-yellow-50 p-3 rounded border border-yellow-300 mb-4">
+             <h3 class="font-bold text-yellow-800 mb-2"><i class="fas fa-edit"></i> Pilih Kelas yang Akan Diinput</h3>
+             <div class="grid grid-cols-2 gap-2">
+                <div>
+                   <label class="font-semibold text-xs">Pilih Kelas</label>
+                   <select id="pfPilihKelas" class="w-full border p-2 rounded font-bold" onchange="gantiKelasPf()">
+                      <option value="1">Kelas 1</option>
+                      <option value="2">Kelas 2</option>
+                      <option value="3">Kelas 3</option>
+                      <option value="4">Kelas 4</option>
+                      <option value="5">Kelas 5</option>
+                      <option value="6">Kelas 6</option>
+                   </select>
+                </div>
+                <div>
+                   <label class="font-semibold text-xs">Tahun Ajaran Kelas Ini</label>
+                   <select id="pfPilihTahun" class="w-full border p-2 rounded font-bold" onchange="updateTahunKelasPf()">
+                      <option value="2019/2020">2019/2020 (Kurikulum 2013)</option>
+                      <option value="2020/2021">2020/2021 (Kurikulum 2013)</option>
+                      <option value="2021/2022">2021/2022 (Kurikulum 2013)</option>
+                      <option value="2022/2023">2022/2023 (Kurikulum 2013)</option>
+                      <option value="2023/2024">2023/2024 (K. Merdeka)</option>
+                      <option value="2024/2025">2024/2025 (K. Merdeka)</option>
+                      <option value="2025/2026">2025/2026 (K. Merdeka)</option>
+                      <option value="2026/2027">2026/2027 (K. Merdeka)</option>
+                   </select>
+                </div>
+             </div>
+          </div>
+
+          <!-- AREA INPUT NILAI DINAMIS -->
+          <div class="border rounded p-3 bg-gray-50 mb-4">
+             <table class="w-full text-xs text-center border-collapse bg-white shadow-sm" border="1">
+               <thead class="bg-gray-200">
+                  <tr><th class="p-1 w-1/2">Mata Pelajaran</th><th class="p-1 w-1/4">Smt 1</th><th class="p-1 w-1/4">Smt 2</th></tr>
+               </thead>
+               <tbody id="bodyInputPf">
+                  <!-- Form input akan di-generate otomatis oleh JavaScript -->
+               </tbody>
+             </table>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 mb-4">
+             <div><label class="font-semibold text-xs">Tanggal Cetak</label><input type="text" id="pfTanggal" placeholder="Cth: 15 Juni 2026" class="w-full border p-2 rounded" oninput="renderPreviewPf()"></div>
+             <div><label class="font-semibold text-xs">Kepala Sekolah</label><input type="text" id="pfKepsek" class="w-full border p-2 rounded" oninput="renderPreviewPf()"></div>
+          </div>
+
+          <!-- TOMBOL AKSI -->
+          <div class="flex flex-col gap-2 pt-4 border-t mt-auto">
+            <div class="flex gap-2">
+              <button onclick="simpanPortofolio()" class="w-1/2 bg-green-600 text-white p-2 rounded hover:bg-green-700 font-bold shadow"><i class="fas fa-save"></i> Simpan ke Drive</button>
+              <button onclick="resetPortofolio()" class="w-1/2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600 font-bold shadow"><i class="fas fa-undo"></i> Bersihkan</button>
+            </div>
+            <div class="flex gap-2 mt-1">
+              <button onclick="window.print()" class="w-1/2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-bold shadow"><i class="fas fa-print"></i> Cetak A4</button>
+              <button onclick="prosesSimpanKeDrive('preview-portofolio', 'Portofolio_Siswa')" class="w-1/2 bg-red-700 text-white p-2 rounded hover:bg-red-800 font-bold shadow"><i class="fab fa-google-drive"></i> Simpan PDF Drive</button>
+            </div>
+          </div>
+
+          <!-- TABEL DAFTAR DATA -->
+          <div class="mt-4 border-t pt-4">
+            <h3 class="font-bold text-sm mb-2">Hasil Rekap Tersimpan</h3>
+            <div class="overflow-x-auto h-32">
+              <table class="w-full text-left text-xs border-collapse" id="tabel-pf">
+                <thead class="bg-gray-200"><tr><th class="border p-2">Thn Masuk</th><th class="border p-2">Nama</th><th class="border p-2">NISN</th><th class="border p-2">Aksi</th></tr></thead>
+                <tbody><tr><td colspan="4" class="text-center p-2 text-gray-500">Silakan muat data...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- KANAN: Preview Kertas A4 (Landscape Mode Simulation) -->
+        <div class="w-1/2 flex flex-col h-full overflow-hidden">
+          <div class="preview-area rounded shadow flex-1 relative bg-gray-200 flex justify-center">
+            
+            <div id="preview-portofolio" class="a4-paper block" style="font-family: Arial, sans-serif; padding: 15mm; line-height: 1.3;">
+              
+              <!-- KOP SURAT -->
+              <div style="border-bottom: 3px solid #008000; padding-bottom: 5px; margin-bottom: 15px; color: #008000; display: flex; align-items: center;">
+                <div style="width: 30%; text-align: center;"><img src="https://drive.google.com/thumbnail?id=18hU1rW7RUfZ2P2qxojcQ35GNUjt-hkRA" alt="logo sd" style="width: 90px;"></div>
+                <div style="width: 200%; text-align: center;">
+                  <h2 style="margin: 0; font-size: 16pt; font-weight: bold;">YAYASAN ANNIHAYAH</h2>
+                  <h1 style="margin: 0; font-size: 22pt; font-weight: bold;">SDIT ANNIHAYAH</h1>
+                  <p style="margin: 0; font-size: 8pt; font-weight: bold;">SK Izin : 503/4853/5/IPSS/X/DPMPTSP/2019 NPSN : 69993044</p>
+                  <p style="margin: 0; font-size: 8pt;">Dusun Krajan Satu Desa Sukamerta Kec. Rawamerta - Karawang</p>
+                </div>
+              </div>
+
+              <div style="text-align: center; margin-bottom: 15px;">
+                <h3 style="font-size: 12pt; font-weight: bold; margin: 0; text-decoration: underline;">BUKU INDUK / PORTOFOLIO NILAI SISWA</h3>
+              </div>
+
+              <table style="width: 100%; margin-bottom: 10px; font-size: 10pt;">
+                <tr><td width="15%">Nama Siswa</td><td width="2%">:</td><td class="v-pfNama font-bold"></td><td width="15%">Tahun Masuk</td><td width="2%">:</td><td class="v-pfTahunMasuk"></td></tr>
+                <tr><td>NISN</td><td>:</td><td class="v-pfNisn"></td><td colspan="3"></td></tr>
+              </table>
+
+              <!-- TABEL MATRIKS NILAI 1-6 -->
+              <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 8.5pt;" border="1" cellpadding="4">
+                <thead style="background-color: #f3f4f6; font-weight: bold;">
+                  <tr>
+                    <td rowspan="2" width="4%">No</td>
+                    <td rowspan="2" width="24%">Mata Pelajaran</td>
+                    <td colspan="2">Kelas 1<br><span id="prevTh1" style="font-size:7pt; font-weight:normal;"></span></td>
+                    <td colspan="2">Kelas 2<br><span id="prevTh2" style="font-size:7pt; font-weight:normal;"></span></td>
+                    <td colspan="2">Kelas 3<br><span id="prevTh3" style="font-size:7pt; font-weight:normal;"></span></td>
+                    <td colspan="2">Kelas 4<br><span id="prevTh4" style="font-size:7pt; font-weight:normal;"></span></td>
+                    <td colspan="2">Kelas 5<br><span id="prevTh5" style="font-size:7pt; font-weight:normal;"></span></td>
+                    <td colspan="2">Kelas 6<br><span id="prevTh6" style="font-size:7pt; font-weight:normal;"></span></td>
+                  </tr>
+                  <tr>
+                    <td width="6%">S1</td><td width="6%">S2</td><td width="6%">S1</td><td width="6%">S2</td><td width="6%">S1</td><td width="6%">S2</td>
+                    <td width="6%">S1</td><td width="6%">S2</td><td width="6%">S1</td><td width="6%">S2</td><td width="6%">S1</td><td width="6%">S2</td>
+                  </tr>
+                </thead>
+                <tbody id="bodyPreviewPf">
+                  <!-- Generate by JS -->
+                </tbody>
+              </table>
+
+              <div style="margin-top: 30px; display: flex; justify-content: flex-end; font-size: 10pt;">
+                <div style="text-align: center; width: 200px;">
+                  <p>Karawang, <span class="v-pfTanggal"></span></p>
+                  <p>Kepala Sekolah,</p><br><br><br>
+                  <p style="font-weight: bold; text-decoration: underline;" class="v-pfKepsek"></p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- WAJIB ADA: Baris ini memanggil semua logika dari javascript.html agar klik menu & live preview bekerja -->
+  <?!= include('javascript'); ?>
+  <!-- ========================================== -->
+    <!-- MODUL CETAK RAPOR RESMI SDIT ANNIHAYAH     -->
+    <!-- ========================================== -->
+    <div id="page-rapor" class="page-content hidden flex flex-col h-full p-4 box-border">
+      <div class="flex justify-between items-center mb-4 no-print bg-white p-3 rounded shadow">
+        <h2 class="text-xl font-bold text-green-800"><i class="fas fa-graduation-cap"></i> Modul Cetak Rapor Siswa</h2>
+        <div class="flex gap-2">
+          <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-700"><i class="fas fa-print"></i> Cetak / Simpan PDF</button>
+        </div>
+      </div>
+
+      <div class="flex gap-4 h-full overflow-hidden">
+        <!-- KIRI: Panel Pengaturan Rapor -->
+        <div class="w-1/3 bg-white p-4 rounded shadow overflow-y-auto no-print text-sm space-y-3">
+          <h3 class="font-bold border-b pb-1 text-gray-700">Pilih Siswa & Semester</h3>
+          <div>
+            <label class="font-semibold text-xs">Pilih Siswa Aktif</label>
+            <select id="raporPilihSiswa" class="w-full border p-2 rounded font-bold bg-blue-50" onchange="sinkronSiswaKeRapor()">
+              <option value="">-- Pilih Siswa --</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="text-xs font-semibold">Semester</label><select id="raporSemester" class="w-full border p-1 rounded" onchange="updatePreviewRapor()"><option value="1">1 (Ganjil)</option><option value="2">2 (Genap)</option></select></div>
+            <div><label class="text-xs font-semibold">Tahun Pelajaran</label><input type="text" id="raporTahunAjaran" value="2025/2026" class="w-full border p-1 rounded" oninput="updatePreviewRapor()"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="text-xs font-semibold">Fase</label><input type="text" id="raporFase" value="C" class="w-full border p-1 rounded" oninput="updatePreviewRapor()"></div>
+            <div><label class="text-xs font-semibold">Kenaikan Kelas</label><input type="text" id="raporKenaikan" value="Naik ke kelas VI" class="w-full border p-1 rounded" oninput="updatePreviewRapor()"></div>
+          </div>
+
+          <h3 class="font-bold border-b pb-1 pt-2 text-green-700">Ketidakhadiran</h3>
+          <div class="grid grid-cols-3 gap-2">
+            <div><label class="text-xs">Sakit</label><input type="number" id="raporSakit" value="0" class="w-full border p-1 rounded" oninput="updatePreviewRapor()"></div>
+            <div><label class="text-xs">Izin</label><input type="number" id="raporIzin" value="0" class="w-full border p-1 rounded" oninput="updatePreviewRapor()"></div>
+            <div><label class="text-xs">Tanpa Ket.</label><input type="number" id="raporAlpha" value="0" class="w-full border p-1 rounded" oninput="updatePreviewRapor()"></div>
+          </div>
+
+          <h3 class="font-bold border-b pb-1 pt-2 text-purple-700">Catatan & Penandatangan</h3>
+          <div><label class="text-xs font-semibold">Catatan Wali Kelas</label><textarea id="raporCatatan" class="w-full border p-1 rounded h-16 text-xs" oninput="updatePreviewRapor()">Pertahankan prestasimu yang luar biasa di semester ini. Sikap disiplin dan keaktifan Ananda di kelas sangat membanggakan.</textarea></div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="text-xs font-semibold">Tempat Cetak</label><input type="text" id="raporTempat" value="Karawang" class="w-full border p-1 rounded" oninput="updatePreviewRapor()"></div>
+            <div><label class="text-xs font-semibold">Tanggal Cetak</label><input type="text" id="raporTglCetak" value="24 Juni 2026" class="w-full border p-1 rounded" oninput="updatePreviewRapor()"></div>
+          </div>
+          <div><label class="text-xs font-semibold">Nama Wali Kelas</label><input type="text" id="raporWaliKelas" value="SELMA MEILA PUSPITA, S.Hum., M.Pd" class="w-full border p-1 rounded" oninput="updatePreviewRapor()"></div>
+          <div><label class="text-xs font-semibold">Nama Kepala Sekolah</label><input type="text" id="raporKepsek" value="KARTIKA DEWI, S.Pd" class="w-full border p-1 rounded" oninput="updatePreviewRapor()"></div>
+        </div>
+
+        <!-- KANAN: Preview Lembar Rapor Format A4 -->
+        <div class="w-2/3 bg-gray-300 p-4 rounded shadow overflow-y-auto flex justify-center">
+          <div id="lembar-rapor-a4" class="bg-white shadow-2xl p-8 box-border" style="width: 210mm; min-height: 297mm; font-family: 'Times New Roman', Times, serif; font-size: 11pt; color: #000; position: relative;">
+            
+            <!-- HEADER SEKOLAH -->
+            <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 15px;">
+              <h2 style="margin: 0; font-size: 14pt; font-weight: bold;">YAYASAN PENDIDIKAN ISLAM TERPADU ANNIHAYAH</h2>
+              <h1 style="margin: 2px 0; font-size: 16pt; font-weight: bold;">SDIT ANNIHAYAH</h1>
+              <p style="margin: 0; font-size: 10pt;">Alamat : Dusun Krajan Satu RT 007/004, Karawang</p>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 15px;">
+              <h3 style="margin: 0; font-size: 13pt; font-weight: bold; text-decoration: underline;">LAPORAN HASIL BELAJAR (RAPOR)</h3>
+            </div>
+
+            <!-- IDENTITAS SISWA -->
+            <table style="width: 100%; font-size: 10.5pt; margin-bottom: 15px; border-collapse: collapse;">
+              <tr>
+                <td width="18%">Nama Peserta Didik</td><td width="2%">:</td><td width="50%" style="font-weight: bold;" id="prevRaporNama">...</td>
+                <td width="12%">Kelas</td><td width="2%">:</td><td width="16%" id="prevRaporKelas">...</td>
+              </tr>
+              <tr>
+                <td>NIS / NISN</td><td>:</td><td id="prevRaporNisn">...</td>
+                <td>Fase</td><td>:</td><td id="prevRaporFase">C</td>
+              </tr>
+              <tr>
+                <td>Nama Sekolah</td><td>:</td><td>SDIT ANNIHAYAH</td>
+                <td>Semester</td><td>:</td><td id="prevRaporSemester">1</td>
+              </tr>
+              <tr>
+                <td>Alamat</td><td>:</td><td>Dusun Krajan Satu RT 007/004</td>
+                <td>Tahun Pelajaran</td><td>:</td><td id="prevRaporTahun">2025/2026</td>
+              </tr>
+            </table>
+
+            <!-- TABEL NILAI MATA PELAJARAN -->
+            <p style="font-weight: bold; margin: 0 0 5px 0; font-size: 11pt;">A. Pencapaian Kompetensi Mata Pelajaran</p>
+            <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 15px;">
+              <thead>
+                <tr style="background-color: #f3f4f6; text-align: center;">
+                  <th width="6%">No</th>
+                  <th width="28%">Mata Pelajaran</th>
+                  <th width="10%">Nilai Akhir</th>
+                  <th width="56%">Capaian Kompetensi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td align="center">1</td>
+                  <td style="font-weight: bold;">Pendidikan Agama Islam dan Budi Pekerti</td>
+                  <td align="center" style="font-weight: bold;">95</td>
+                  <td>Mencapai Kompetensi dengan sangat baik dalam hal peserta didik mampu membaca al-quran dengan baik dan benar. Perlu peningkatan dalam hal siswa dapat menguasai/melafalkan niat-niat ibadah.</td>
+                </tr>
+                <tr>
+                  <td align="center">2</td>
+                  <td style="font-weight: bold;">Pendidikan Pancasila dan Kewarganegaraan</td>
+                  <td align="center" style="font-weight: bold;">92</td>
+                  <td>Mencapai Kompetensi dengan sangat baik dalam hal Peserta didik mampu menjelaskan cara menghormati keragaman yang ada di Indonesia.</td>
+                </tr>
+                <tr>
+                  <td align="center">3</td>
+                  <td style="font-weight: bold;">Bahasa Indonesia</td>
+                  <td align="center" style="font-weight: bold;">92</td>
+                  <td>Mencapai Kompetensi dengan sangat baik dalam hal Peserta didik mampu menggunakan kosakata baru yang memiliki makna denotatif dan konotatif.</td>
+                </tr>
+                <tr>
+                  <td align="center">4</td>
+                  <td style="font-weight: bold;">Matematika (Umum)</td>
+                  <td align="center" style="font-weight: bold;">93</td>
+                  <td>Mencapai Kompetensi dengan sangat baik dalam hal Peserta didik dapat menyajikan dan menganalisis data dalam bentuk diagram.</td>
+                </tr>
+                <tr>
+                  <td align="center">5</td>
+                  <td style="font-weight: bold;">Ilmu Pengetahuan Alam dan Sosial (IPAS)</td>
+                  <td align="center" style="font-weight: bold;">92</td>
+                  <td>Mencapai Kompetensi dengan sangat baik dalam hal Peserta didik mampu mengenal warisan budaya dan mengetahui sejarahnya.</td>
+                </tr>
+                <tr>
+                  <td align="center">6</td>
+                  <td style="font-weight: bold;">Pendidikan Jasmani, Olahraga, dan Kesehatan</td>
+                  <td align="center" style="font-weight: bold;">91</td>
+                  <td>Mencapai Kompetensi dengan sangat baik dalam hal menjelaskan bahaya minuman keras bagi kesehatan tubuh.</td>
+                </tr>
+                <tr>
+                  <td align="center">7</td>
+                  <td style="font-weight: bold;">Seni Budaya</td>
+                  <td align="center" style="font-weight: bold;">94</td>
+                  <td>Mencapai Kompetensi dengan sangat baik dalam hal Peserta didik mampu menerapkan pola lantai tari tradisional secara berkelompok.</td>
+                </tr>
+                <tr>
+                  <td align="center">8</td>
+                  <td style="font-weight: bold;">Bahasa Inggris</td>
+                  <td align="center" style="font-weight: bold;">95</td>
+                  <td>Mencapai Kompetensi dengan sangat baik dalam hal peserta didik mampu mengidentifikasi jenis-jenis profesi dalam keluarga.</td>
+                </tr>
+                <tr>
+                  <td align="center">9</td>
+                  <td style="font-weight: bold;">Muatan Lokal Bahasa Daerah</td>
+                  <td align="center" style="font-weight: bold;">92</td>
+                  <td>Mencapai Kompetensi dengan sangat baik dalam hal nyawalakeun perkara kadaharan tradisional Sunda.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- EKSTRAKURIKULER & KETIDAKHADIRAN -->
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+              <div style="width: 60%;">
+                <p style="font-weight: bold; margin: 0 0 5px 0; font-size: 10.5pt;">B. Kegiatan Ekstrakurikuler</p>
+                <table border="1" cellpadding="4" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 9.5pt;">
+                  <tr style="background-color: #f3f4f6; text-align: center;">
+                    <th width="10%">No</th><th width="45%">Kegiatan Ekstrakurikuler</th><th width="15%">Predikat</th><th width="30%">Keterangan</th>
+                  </tr>
+                  <tr><td align="center">1</td><td>BTIQ</td><td align="center">B</td><td>Tingkatkan terus hafalan tajwidnya</td></tr>
+                  <tr><td align="center">2</td><td>Pramuka</td><td align="center">A</td><td>Sangat aktif dan disiplin</td></tr>
+                </table>
+              </div>
+              <div style="width: 40%;">
+                <p style="font-weight: bold; margin: 0 0 5px 0; font-size: 10.5pt;">C. Ketidakhadiran</p>
+                <table border="1" cellpadding="4" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 9.5pt;">
+                  <tr><td>Sakit</td><td align="center" width="25%"><span id="prevRaporSakit">0</span> hari</td></tr>
+                  <tr><td>Izin</td><td align="center"><span id="prevRaporIzin">0</span> hari</td></tr>
+                  <tr><td>Tanpa Keterangan</td><td align="center"><span id="prevRaporAlpha">0</span> hari</td></tr>
+                </table>
+              </div>
+            </div>
+
+            <!-- CATATAN & KENAIKAN KELAS -->
+            <div style="margin-bottom: 15px; border: 1px solid #000; padding: 8px; font-size: 10pt;">
+              <p style="font-weight: bold; margin: 0 0 3px 0;">D. Catatan Wali Kelas & Keputusan</p>
+              <p style="margin: 0 0 5px 0; font-style: italic;" id="prevRaporCatatan">...</p>
+              <p style="margin: 0; font-weight: bold;" id="prevRaporKenaikan">Keputusan: Naik ke kelas VI</p>
+            </div>
+
+            <!-- TANDA TANGAN -->
+            <table style="width: 100%; font-size: 10.5pt; margin-top: 20px; text-align: center;">
+              <tr>
+                <td width="33%" valign="top">
+                  <p>Mengetahui,</p>
+                  <p>Orang Tua / Wali Murid</p>
+                  <br><br><br>
+                  <p style="text-decoration: underline; font-weight: bold;">( .................................... )</p>
+                </td>
+                <!-- KOLOM TTD KEPALA SEKOLAH / PENANDATANGAN -->
+                <td width="34%" valign="top" style="position: relative; text-align: center;">
+                  <p style="margin: 0;">Mengetahui,</p>
+                  <p style="margin: 0 0 5px 0;">Kepala SDIT Annihayah</p>
+  
+                   <!-- WADAH STEMPEL & TTD -->
+                   <div style="position: relative; height: 75px; display: flex; align-items: center; justify-content: center;">
+                   <img class="img-stempel-ttd" 
+                     id="imgTtdKepsek"
+                     src="https://lh3.googleusercontent.com/d/1bObiP8YCotZPyoG0CoZdcJ7fuIq_Kgz2" 
+                      alt="Stempel & TTD" 
+                       style="max-height: 90px; width: auto; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 10; mix-blend-mode: screen; filter: contrast(140%); display: block;"
+                        onerror="this.style.display='none';">
+                    </div>
+
+  <p style="text-decoration: underline; font-weight: bold; margin: 0; position: relative; z-index: 20;">KARTIKA DEWI, S.Pd</p>
+</td>
+
+                  <p style="text-decoration: underline; font-weight: bold; margin: 0; position: relative; z-index: 20;" id="prevRaporKepsek">KARTIKA DEWI, S.Pd</p>
+                </td>
+              </tr>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ========================================== -->
+    <!-- MODUL DAFTAR 1 BULANAN (REKAP SISWA & USIA) -->
+    <!-- ========================================== -->
+    <div id="page-daftar1" class="page-content hidden flex flex-col h-full p-4 box-border overflow-y-auto">
+      
+      <!-- HEADER UTAMA HALAMAN (KONSISTEN DI ATAS FORM) -->
+      <div class="flex justify-between items-center mb-4 bg-white p-4 rounded shadow w-full">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <i class="fas fa-file-invoice text-indigo-600"></i> Laporan Daftar 1 Bulanan
+          </h2>
+          <p class="text-xs text-gray-500">Rekapitulasi jumlah siswa per kelas dan distribusi usia anak</p>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" onclick="toggleTinjauanDaftar1()" id="btnToggleDaftar1" class="bg-indigo-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-indigo-700 shadow flex items-center gap-2">
+            <i class="fas fa-eye"></i> <span>Buka Tinjauan A4</span>
+          </button>
+          <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-blue-700 shadow flex items-center gap-1">
+            <i class="fas fa-print"></i> <span>Cetak A4</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTAINER UTAMA -->
+      <div class="w-full">
+        
+        <!-- 1. FORM INPUT (TAMPIL FULL 100% SECARA DEFAULT) -->
+        <div id="form-container-daftar1" class="w-full bg-white p-5 rounded shadow space-y-6">
+          
+          <!-- PERIODE BULAN & TAHUN -->
+          <div class="bg-indigo-50 p-3 rounded border border-indigo-200 flex gap-4 items-center">
+            <div>
+              <label class="font-semibold text-xs text-indigo-900 block mb-1">Bulan Laporan</label>
+              <select id="d1Bulan" class="border p-2 rounded text-sm font-bold bg-white" onchange="updateDaftar1()">
+                <option value="Januari">Januari</option><option value="Februari">Februari</option><option value="Maret">Maret</option>
+                <option value="April">April</option><option value="Mei">Mei</option><option value="Juni">Juni</option>
+                <option value="Juli">Juli</option><option value="Agustus">Agustus</option><option value="September">September</option>
+                <option value="Oktober" selected>Oktober</option><option value="November">November</option><option value="Desember">Desember</option>
+              </select>
+            </div>
+            <div>
+              <label class="font-semibold text-xs text-indigo-900 block mb-1">Tahun</label>
+              <input type="number" id="d1Tahun" value="2026" class="w-28 border p-2 rounded text-sm font-bold bg-white" oninput="updateDaftar1()">
+            </div>
+          </div>
+
+          <!-- SECTION 1: JUMLAH MURID PER KELAS (I - VI) -->
+          <div>
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
+              <i class="fas fa-users text-blue-600"></i> 1. Jumlah Banyak Murid Per Kelas
+            </h3>
+            <div class="overflow-x-auto border rounded">
+              <table class="w-full text-center text-xs border-collapse min-w-[700px]">
+                <thead class="bg-gray-100 font-bold">
+                  <tr>
+                    <th class="p-2 border" rowspan="2">Keterangan</th>
+                    <th class="p-2 border" colspan="2">Kelas I</th>
+                    <th class="p-2 border" colspan="2">Kelas II</th>
+                    <th class="p-2 border" colspan="2">Kelas III</th>
+                    <th class="p-2 border" colspan="2">Kelas IV</th>
+                    <th class="p-2 border" colspan="2">Kelas V</th>
+                    <th class="p-2 border" colspan="2">Kelas VI</th>
+                    <th class="p-2 border bg-indigo-100" colspan="2">Total Akhir</th>
+                  </tr>
+                  <tr>
+                    <th class="p-1 border">L</th><th class="p-1 border">P</th>
+                    <th class="p-1 border">L</th><th class="p-1 border">P</th>
+                    <th class="p-1 border">L</th><th class="p-1 border">P</th>
+                    <th class="p-1 border">L</th><th class="p-1 border">P</th>
+                    <th class="p-1 border">L</th><th class="p-1 border">P</th>
+                    <th class="p-1 border">L</th><th class="p-1 border">P</th>
+                    <th class="p-1 border bg-indigo-100">Total L</th><th class="p-1 border bg-indigo-100">Total P</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="p-2 border font-bold text-left bg-gray-50">Penghabisan Bulan Lalu</td>
+                    <td><input type="number" id="d1_k1_l" value="17" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td><input type="number" id="d1_k1_p" value="18" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td><input type="number" id="d1_k2_l" value="16" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td><input type="number" id="d1_k2_p" value="8" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td><input type="number" id="d1_k3_l" value="29" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td><input type="number" id="d1_k3_p" value="14" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td><input type="number" id="d1_k4_l" value="27" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td><input type="number" id="d1_k4_p" value="13" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td><input type="number" id="d1_k5_l" value="26" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td><input type="number" id="d1_k5_p" value="14" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td><input type="number" id="d1_k6_l" value="37" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td><input type="number" id="d1_k6_p" value="16" class="w-12 border text-center p-1 rounded" oninput="updateDaftar1()"></td>
+                    <td class="p-2 border font-bold text-blue-700 bg-indigo-50" id="calc_total_l">152</td>
+                    <td class="p-2 border font-bold text-pink-700 bg-indigo-50" id="calc_total_p">83</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- SECTION 2: USIA ANAK PER KELAS (6 - 14 TH) -->
+          <div>
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
+              <i class="fas fa-child text-green-600"></i> 2. Rekapitulasi Usia Anak (L / P)
+            </h3>
+            <div class="overflow-x-auto border rounded">
+              <table class="w-full text-center text-xs border-collapse min-w-[700px]" id="tabel-input-usia">
+                <thead class="bg-gray-100 font-bold">
+                  <tr>
+                    <th class="p-2 border">Kelas</th>
+                    <th class="p-1 border">6 Th</th>
+                    <th class="p-1 border">7 Th</th>
+                    <th class="p-1 border">8 Th</th>
+                    <th class="p-1 border">9 Th</th>
+                    <th class="p-1 border">10 Th</th>
+                    <th class="p-1 border">11 Th</th>
+                    <th class="p-1 border">12 Th</th>
+                    <th class="p-1 border">13 Th</th>
+                    <th class="p-1 border">14 Th</th>
+                    <th class="p-2 border bg-green-50">Jumlah (L/P = Total)</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-usia-input">
+                  <!-- Diisi otomatis oleh JavaScript -->
+                </tbody>
+              </table>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">*Format pengisian usia: ketik angka dengan pemisah miring `/` (Contoh: `5/7` artinya 5 Laki-laki / 7 Perempuan).</p>
+          </div>
+
+          <!-- TOMBOL AKSI SIMPAN -->
+          <div class="flex gap-2 pt-3 border-t">
+            <button onclick="simpanDaftar1()" class="bg-green-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-green-700 shadow flex items-center gap-1">
+            <i class="fas fa-save"></i> <span>Simpan Laporan Daftar 1</span>
+            </button>
+            <button onclick="toggleTinjauanDaftar1()" class="bg-indigo-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-indigo-700 shadow flex items-center gap-1">
+              <i class="fas fa-eye"></i> <span>Tinjau Sebelum Cetak</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- 2. AREA TINJAUAN KERTAS A4 (SEMBUNYI TOTAL SAAT TIDAK DIGUNAKAN) -->
+        <div id="preview-area-d1" class="w-full bg-gray-300 p-6 rounded shadow hidden flex-col items-center justify-center overflow-x-auto">
+          
+          <div class="mb-4 no-print flex gap-3">
+             <button onclick="toggleTinjauanDaftar1()" class="bg-gray-700 text-white px-4 py-2 rounded text-xs font-bold hover:bg-gray-800 shadow flex items-center gap-1">
+               <i class="fas fa-arrow-left"></i> <span>Kembali ke Form Input</span>
+             </button>
+             <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-blue-700 shadow flex items-center gap-1">
+               <i class="fas fa-print"></i> <span>Cetak Kertas A4 Sekarang</span>
+             </button>
+          </div>
+
+          <!-- LEMBAR A4 DAFTAR 1 -->
+          <div id="lembar-d1-a4" class="bg-white p-8 shadow-2xl rounded box-border" style="width: 210mm; min-height: 297mm; font-family: Arial, sans-serif; font-size: 8pt; color: #000;">
+            
+            <!-- HEADER DAFTAR 1 -->
+            <div style="display: flex; border: 1.5px solid #000; margin-bottom: 10px;">
+              <div style="width: 22%; padding: 6px; border-right: 1.5px solid #000; text-align: center; font-weight: bold; display: flex; flex-direction: column; justify-content: center;">
+                DAFTAR I BULAN<br>
+                <span id="prevD1BulanTahun" style="font-size: 11pt; text-transform: uppercase; margin-top: 4px;">OKTOBER 2026</span>
+              </div>
+              <div style="width: 78%; padding: 6px; font-size: 8pt;">
+                <h3 style="margin: 0 0 4px 0; font-size: 12pt; text-align: center; font-weight: bold;">SDIT ANNIHAYAH</h3>
+                <table style="width: 100%; border: none;">
+                  <tr><td width="40%">Status : Swasta Full</td><td width="60%">NPSN : 69993044</td></tr>
+                  <tr><td>Tahun Pendirian : 2016</td><td>Alamat : Dusun Krajan Satu, Sukamerta, Rawamerta</td></tr>
+                  <tr><td>Akreditasi : A (2022)</td><td>Kabupaten/Provinsi : Karawang / Jawa Barat</td></tr>
+                </table>
+              </div>
+            </div>
+
+            <!-- TABEL A. USIA ANAK -->
+            <p style="font-weight: bold; margin: 8px 0 3px 0; font-size: 8.5pt;">A. USIA ANAK</p>
+            <table border="1" cellpadding="3" cellspacing="0" style="width: 100%; border-collapse: collapse; text-align: center; font-size: 8pt; margin-bottom: 12px;">
+              <tr style="background-color: #f3f4f6; font-weight: bold;">
+                <td width="12%">Kelas</td>
+                <td width="8%">6 TH</td><td width="8%">7 TH</td><td width="8%">8 TH</td><td width="8%">9 TH</td>
+                <td width="8%">10 TH</td><td width="8%">11 TH</td><td width="8%">12 TH</td><td width="8%">13 TH</td><td width="8%">14 TH</td>
+                <td width="16%">JUMLAH (L/P = T)</td>
+              </tr>
+              <tbody id="prevD1TbodyUsia">
+                <!-- Diisi otomatis dari JS -->
+              </tbody>
+            </table>
+
+            <!-- TABEL UTAMA: BANYAK MURID -->
+            <p style="font-weight: bold; margin: 8px 0 3px 0; font-size: 8.5pt;">BANYAK MURID</p>
+            <table border="1" cellpadding="3" cellspacing="0" style="width: 100%; border-collapse: collapse; text-align: center; font-size: 8pt; margin-bottom: 12px;">
+              <tr style="background-color: #f3f4f6; font-weight: bold;">
+                <td rowspan="2" width="25%">KETERANGAN</td>
+                <td colspan="2">I</td><td colspan="2">II</td><td colspan="2">III</td><td colspan="2">IV</td><td colspan="2">V</td><td colspan="2">VI</td>
+                <td colspan="2">JUMLAH</td>
+                <td rowspan="2" width="10%">JUMLAH SEMUA</td>
+              </tr>
+              <tr style="background-color: #f3f4f6; font-weight: bold;">
+                <td>L</td><td>P</td><td>L</td><td>P</td><td>L</td><td>P</td><td>L</td><td>P</td><td>L</td><td>P</td><td>L</td><td>P</td><td>L</td><td>P</td>
+              </tr>
+              <tr>
+                <td style="text-align: left; padding-left: 5px;">Penghabisan Bulan Lalu</td>
+                <td id="p_k1_l">17</td><td id="p_k1_p">18</td>
+                <td id="p_k2_l">16</td><td id="p_k2_p">8</td>
+                <td id="p_k3_l">29</td><td id="p_k3_p">14</td>
+                <td id="p_k4_l">27</td><td id="p_k4_p">13</td>
+                <td id="p_k5_l">26</td><td id="p_k5_p">14</td>
+                <td id="p_k6_l">37</td><td id="p_k6_p">16</td>
+                <td id="p_tot_l" style="font-weight: bold;">152</td>
+                <td id="p_tot_p" style="font-weight: bold;">83</td>
+                <td id="p_tot_all" style="font-weight: bold; font-size: 9.5pt; background-color: #e5e7eb;">235</td>
+              </tr>
+              <tr>
+                <td style="text-align: left; padding-left: 5px;">Keluar Bulan Ini</td>
+                <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
+              </tr>
+              <tr>
+                <td style="text-align: left; padding-left: 5px;">Masuk Bulan Ini</td>
+                <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
+              </tr>
+              <tr style="font-weight: bold; background-color: #f9fafb;">
+                <td style="text-align: left; padding-left: 5px;">Jumlah Penghabisan Bulan Ini</td>
+                <td id="p_k1_tot">35</td><td colspan="1">-</td>
+                <td id="p_k2_tot">24</td><td colspan="1">-</td>
+                <td id="p_k3_tot">43</td><td colspan="1">-</td>
+                <td id="p_k4_tot">40</td><td colspan="1">-</td>
+                <td id="p_k5_tot">40</td><td colspan="1">-</td>
+                <td id="p_k6_tot">53</td><td colspan="1">-</td>
+                <td id="p_tot_l_end">152</td><td id="p_tot_p_end">83</td>
+                <td id="p_tot_grand" style="font-size: 10pt; font-weight: bold; background-color: #d1fae5;">235</td>
+              </tr>
+            </table>
+
+            <!-- FOOTER PENANDATANGANAN DAFTAR 1 -->
+            <div style="margin-top: 35px; display: flex; justify-content: space-between; font-size: 8.5pt;">
+              <div style="text-align: center; width: 40%;">
+                <p style="margin:0;">Mengetahui,</p>
+                <p style="margin:0;">Komite Sekolah</p>
+                <br><br><br>
+                <p style="font-weight: bold; text-decoration: underline; margin:0;">( .................................... )</p>
+              </div>
+              <div style="text-align: center; width: 40%;">
+                <p style="margin:0;">Rawamerta, <span id="prevD1TglTtd">31 Oktober 2026</span></p>
+                <p style="margin:0;">Kepala SDIT Annihayah</p>
+                <br><br><br>
+                <p style="font-weight: bold; text-decoration: underline; margin:0;">KARTIKA DEWI, S.Pd</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+</body>
+</html>
