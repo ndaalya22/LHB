@@ -1,0 +1,112 @@
+<!-- ========================================== -->
+<!-- FILE: stylesheet.html                      -->
+<!-- ========================================== -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+  
+  /* Styling Khusus Area Pratinjau Kanan */
+  .preview-area {
+    background-color: #525659;
+    padding: 20px;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden; /* Mencegah munculnya scroll horizontal */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  
+  /* Bentuk Fisik Kertas A4 */
+  .a4-paper {
+    background: white;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 20mm;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    font-family: 'Times New Roman', Times, serif;
+    color: black;
+    box-sizing: border-box;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  /* 
+   * PERBAIKAN UTAMA: 
+   * Mengecilkan kertas 50% khusus di layar monitor. 
+   * margin-bottom membuang sisa ruang kosong agar scroll tidak kepanjangan.
+   */
+  /* 
+   * PERBAIKAN: 
+   * Skala diperbesar dari 0.5 menjadi 0.75 (75%) agar pas 1/2 layar dan mudah dibaca.
+   * margin-bottom disesuaikan agar scrollbar tidak terlalu panjang ke bawah.
+   */
+  @media screen {
+    .a4-paper {
+      transform: scale(0.75);
+      transform-origin: top center;
+      margin-bottom: -74.25mm; 
+    }
+  }
+
+  /* ==========================================
+     MEMAKSA BORDER TAMPIL PADA KERTAS CETAK A4 
+     (Termasuk LHB, Rapor, Portofolio)
+     ========================================== */
+  .a4-paper table[border="1"] {
+    border-collapse: collapse !important;
+  }
+  
+  .a4-paper table[border="1"],
+  .a4-paper table[border="1"] th,
+  .a4-paper table[border="1"] td {
+    border: 1px solid black !important;
+  }
+  
+  /* Khusus agar header tabel (judul kolom) lebih tebal/jelas */
+  .a4-paper table[border="1"] thead td,
+  .a4-paper table[border="1"] thead th {
+    border-bottom: 2px solid black !important;
+    background-color: #f3f4f6 !important; /* Memberi warna abu-abu tipis pada header */
+  }
+
+  /* 
+   * PENGATURAN CETAK (PRINT)
+   * Saat tombol cetak ditekan, ukuran kertas kembali normal (100%) dan resolusi tetap HD
+   */
+  @media print {
+    body * { visibility: hidden; }
+    .a4-paper, .a4-paper * { visibility: visible; }
+    .a4-paper {
+      position: absolute;
+      left: 0;
+      top: 0;
+      margin: 0;
+      padding: 20mm;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      transform: scale(1); /* Kembalikan ke ukuran 100% */
+    }
+    .no-print { display: none !important; }
+  }
+  
+  /* Styling Kamera Face ID */
+  #video-stream { transform: scaleX(-1); border-radius: 8px; border: 2px solid #3b82f6; }
+  /* ==========================================
+     MEMAKSA BORDER TAMPIL PADA KERTAS CETAK A4 
+     ========================================== */
+  .a4-paper table[border="1"],
+  .a4-paper table[border="1"] th,
+  .a4-paper table[border="1"] td {
+    border: 1px solid black !important;
+  }
+  
+  /* Khusus agar header tabel lebih tebal/jelas */
+  .a4-paper table[border="1"] thead td,
+  .a4-paper table[border="1"] thead th {
+    border-bottom: 2px solid black !important;
+  }
+</style>
